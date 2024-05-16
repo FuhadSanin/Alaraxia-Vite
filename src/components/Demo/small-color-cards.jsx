@@ -8,10 +8,9 @@ import {
 } from "@/components/ui/card"
 
 import { ArrowBigUp } from "lucide-react"
-import cardcolor from "@/assets/cards/card_green.svg"
 import { useMediaQuery } from "react-responsive"
 
-export const Smallcolorcards = () => {
+export const Smallcolorcards = ({ cardcolor }) => {
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
   return (

@@ -15,9 +15,13 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Smallcards } from "@components/Demo/smallcards"
 import { Smallcolorcards } from "@components/Demo/small-color-cards"
 import { DatePickerDemo } from "@/components/ui/datepicker"
-import { ChevronRight } from "lucide-react"
-import { Link } from "react-router-dom"
 import Tablemob from "@components/Demo/table-mob"
+
+//Card Colors Images
+import green from "@/assets/Cards/green.png"
+import red from "@/assets/Cards/red.png"
+import violet from "@/assets/Cards/violet.png"
+import orange from "@/assets/Cards/orange.png"
 
 const values = [
   {
@@ -63,10 +67,10 @@ const Dashboard = () => {
           <Card>
             <CardTitle>Total Users</CardTitle>
             <div className="flex flex-wrap   md:justify-between justify-center gap-4">
-              <Smallcolorcards />
-              <Smallcolorcards />
-              <Smallcolorcards />
-              <Smallcolorcards />
+              <Smallcolorcards cardcolor={green} />
+              <Smallcolorcards cardcolor={red} />
+              <Smallcolorcards cardcolor={violet} />
+              <Smallcolorcards cardcolor={orange} />
             </div>
           </Card>
           {!isMobile && (
