@@ -1,10 +1,15 @@
 import React, { createContext, useState } from "react"
 import { useMediaQuery } from "react-responsive"
-import Sidebar, { SidebarItem } from "@/components/ui/Sidebar"
-import Header from "@/components/ui/Header"
-import { Home, Ticket } from "lucide-react"
 import { cn } from "../lib/utils"
 import { Link } from "react-router-dom"
+
+//components
+import Sidebar, { SidebarSubItem } from "@/components/Demo/Sidebar"
+import Header from "@/components/Demo/Header"
+
+//icons
+import { Home, Ticket, Users, ClipboardMinus } from "lucide-react"
+import Navbarmob from "@components/Demo/Navbar-mob"
 
 // Create context
 export const SidebarContext = createContext()
@@ -24,15 +29,16 @@ export default function Layout({ children }) {
 
   return (
     <div
-      className={cn(
-        "h-screen w-full bg-[#F9FBFE] dark:bg-[#212121] dark:text-white text-black flex ",
-        { "debug-screens": process.env.NODE_ENV === "development" }
-      )}
+      className={cn("h-screen w-full   dark:text-white text-black flex ", {
+        "debug-screens": process.env.NODE_ENV === "development",
+      })}
     >
-      <SidebarContext.Provider value={{ expanded, toggleExpanded, active }}>
+      <SidebarContext.Provider
+        value={{ expanded, toggleExpanded, active, setActive }}
+      >
         {!isMobile && (
           <Sidebar>
-            <SidebarItem
+            <SidebarSubItem
               icon={<Home strokeWidth={1} />}
               text="Dashboard"
               active={active === "Dashboard"}
@@ -40,20 +46,48 @@ export default function Layout({ children }) {
               as={Link}
               to="/"
             />
-            <SidebarItem
+            <SidebarSubItem
               icon={<Ticket strokeWidth={1} />}
               text="Tickets"
               active={active === "Tickets"}
               onClick={() => handleSetActive("Tickets")}
               as={Link}
               to="/ticket"
+              submenus={[
+                {
+                  text: "All Tickets",
+                  to: "/ticket",
+                },
+                {
+                  text: "Create Ticket",
+                  to: "/ticket/create",
+                },
+              ]}
+            />
+            <SidebarSubItem
+              icon={<Users strokeWidth={1} />}
+              text="User Management"
+              active={active === "User Management"}
+              onClick={() => handleSetActive("User Management")}
+              as={Link}
+              to="/management"
+            />
+            <SidebarSubItem
+              icon={<ClipboardMinus strokeWidth={1} />}
+              text="Reports"
+              active={active === "Reports"}
+              onClick={() => handleSetActive("Reports")}
+              as={Link}
+              to="/reports"
             />
           </Sidebar>
         )}
-        <div className="w-full h-screen p-7 ">
+        <div className={`w-full h-screen ${!isMobile ? "p-7" : "p-2"} `}>
           <div>
-            {!isMobile && (
+            {!isMobile ? (
               <Header expanded={expanded} toggleExpanded={toggleExpanded} />
+            ) : (
+              <Navbarmob />
             )}
           </div>
           <div className={isMobile ? "pt-0" : "pt-8"}>{children}</div>

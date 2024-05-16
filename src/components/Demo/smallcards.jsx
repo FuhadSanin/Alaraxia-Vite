@@ -19,7 +19,7 @@ export const Smallcards = () => {
         <CardDescription>This Week</CardDescription>
       </CardContent>
       <CardFooter className="pt-1 pb-2">
-        <Progress value={25} aria-label="25% increase " />
+        <Progress value={50} aria-label="25% increase " />
       </CardFooter>
     </Card>
   )

@@ -1,6 +1,6 @@
 // app/Dashboard/Dashboard.js
 import React, { useState } from "react"
-import { SelectDemo } from "@/components/ui/select-ui"
+import { SelectDemo } from "@/components/Demo/selectDemo"
 import { Card, CardContent } from "@/components/ui/card"
 import { DatePickerDemo } from "@/components/ui/datepicker"
 import { Button } from "@/components/ui/button"
