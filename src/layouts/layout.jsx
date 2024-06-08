@@ -5,17 +5,17 @@ import { Link } from "react-router-dom"
 
 //components
 import Sidebar, { SidebarSubItem } from "@/components/Demo/Sidebar"
-import Header from "@/components/Demo/Header"
+import Header from "@/components/Demo/Navbar"
 
 //icons
 import { Home, Ticket, Users, ClipboardMinus } from "lucide-react"
-import Navbarmob from "@components/Demo/Navbar-mob"
+import Navbarmob from "@components/Demo/NavbarMob"
 
 // Create context
 export const SidebarContext = createContext()
 
 export default function Layout({ children }) {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
   const [active, setActive] = useState("Dashboard")
   const toggleExpanded = () => {
     setExpanded(prevExpanded => !prevExpanded)
@@ -29,7 +29,7 @@ export default function Layout({ children }) {
 
   return (
     <div
-      className={cn("h-screen w-full   dark:text-white text-black flex ", {
+      className={cn("h-screen w-full    dark:text-white text-black flex ", {
         "debug-screens": process.env.NODE_ENV === "development",
       })}
     >

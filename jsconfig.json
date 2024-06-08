@@ -8,7 +8,9 @@
       "@pages/*": ["pages/*"],
       "@theme/*": ["@theme/*"],
       "@lib/*": ["lib/*"],
-      "@layouts/*": ["layouts/*"]
+      "@layouts/*": ["layouts/*"],
+      "@services/*": ["services/*"],
+      "@context/*": ["context/*"]
     }
   }
 }

@@ -1,7 +1,7 @@
+import React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -13,31 +13,54 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
+import Services from "@services/services"
+import { Link } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
+import { useNavigate } from "react-router-dom"
+import { useToast } from "@/components/ui/use-toast"
+
+// Define the form schema using Zod
 
 const FormSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(2),
 })
 
-export function InputForm() {
+export function SignIn() {
+  const { toast } = useToast()
+  const { setAuthToken } = useAuth()
+  const navigate = useNavigate()
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   })
 
-  function onSubmit(data) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+  const onSubmit = data => {
+    if (data.email && data.password) {
+      Services.signIn(data)
+        .then(response => {
+          setAuthToken(response.data) // Store token in context
+          console.log("Signed in successfully. Token:", response.data.token)
+          toast({
+            title: "Success! You are now signed in.",
+            description: `${response.data.token}`,
+            variant: "success",
+          })
+          navigate("/")
+        })
+        .catch(error => {
+          toast({
+            title: "Uh oh! Something went wrong.",
+            description: "There was a problem with your request.",
+            variant: "destructive",
+          })
+          console.error("Error signing in:", error)
+        })
+    }
   }
 
   return (
@@ -57,7 +80,7 @@ export function InputForm() {
               </FormControl>
               <FormMessage />
               <FormDescription className="text-right text-blue-500 cursor-pointer">
-                Forgot Password ?
+                <Link to="/forget-password">Forgot Password?</Link>
               </FormDescription>
             </FormItem>
           )}
@@ -82,3 +105,5 @@ export function InputForm() {
     </Form>
   )
 }
+
+export default SignIn

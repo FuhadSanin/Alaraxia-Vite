@@ -1,6 +1,6 @@
 // app/Dashboard/Dashboard.js
 import React, { useState } from "react"
-import { SelectDemo } from "@/components/Demo/selectDemo"
+import { SelectDemo } from "@/components/Demo/SelectDemo"
 import { Card, CardContent } from "@/components/ui/card"
 import { DatePickerDemo } from "@/components/ui/datepicker"
 import { Button } from "@/components/ui/button"
@@ -47,7 +47,7 @@ const tickets = [
     dealerCode: "C4712",
   },
 ]
-const Ticket = ({ title }) => {
+const Management = ({ title }) => {
   const headers = Object.keys(tickets[0])
   const itemsPerPage = 3
   const [currentPage, setCurrentPage] = useState(1)
@@ -66,12 +66,54 @@ const Ticket = ({ title }) => {
   }
 
   return (
-    <>
+    <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
         <h1 className="text-2xl font-bold mb-4">{title}</h1>
       </div>
       <Card>
         <CardContent>
+          <div class="p-4 mb-8">
+            <div class="flex flex-wrap">
+              <div class="w-full md:w-1/4 border-b-2 border-green-500">
+                <div class="p-3 flex justify-between items-center">
+                  <h6 class="text-green-500">
+                    Total <br />
+                    Technicians
+                  </h6>
+                  <h3 class="text-green-500 text-3xl font-semibold">18</h3>
+                </div>
+              </div>
+              <div class="w-full md:w-1/4 border-b-2 border-orange-500">
+                <div class="p-3 flex justify-between items-center">
+                  <h6 class="text-orange-500">
+                    Total Customer <br />
+                    Care Officers
+                  </h6>
+                  <h3 class="text-orange-500 text-3xl font-semibold">18</h3>
+                </div>
+              </div>
+              <div class="w-full md:w-1/4 border-b-2 border-gray-800">
+                <div class="p-3 flex justify-between items-center">
+                  <h6 class="text-gray-800">
+                    Total Area Service
+                    <br />
+                    Managers
+                  </h6>
+                  <h3 class="text-gray-800 text-3xl font-semibold">18</h3>
+                </div>
+              </div>
+              <div class="w-full md:w-1/4 border-b-2 border-red-500">
+                <div class="p-3 flex justify-between items-center">
+                  <h6 class="text-red-500">
+                    Total Call Centre <br />
+                    Agents
+                  </h6>
+                  <h3 class="text-red-500 text-3xl font-semibold">18</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-wrap justify-between items-center mb-8">
             <div className="w-fit">
               <Command className="rounded-full border ">
@@ -171,8 +213,8 @@ const Ticket = ({ title }) => {
           </div>
         </CardContent>
       </Card>
-    </>
+    </div>
   )
 }
 
-export default Ticket
+export default Management

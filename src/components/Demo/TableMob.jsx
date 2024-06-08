@@ -11,7 +11,7 @@ const Tablemob = ({ values }) => {
           <Card className="bg-white p-0 " key={index}>
             <CardContent className="p-0">
               <div className="flex bg-[#0C2556] text-white p-5 rounded-t-3xl items-center justify-between">
-                <h4>{value["Customer ID"]}</h4>
+                <h4>{value["ticked_id"]}</h4>
                 <Link className="bg-white rounded-full text-gray-500 p-1">
                   <ChevronRight size={20} />
                 </Link>

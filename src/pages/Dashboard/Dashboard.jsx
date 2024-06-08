@@ -12,10 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
-import { Smallcards } from "@components/Demo/smallcards"
-import { Smallcolorcards } from "@components/Demo/small-color-cards"
+import { Smallcards } from "@components/Demo/CardsDashboard"
+import { Smallcolorcards } from "@components/Demo/CardsColorDashboard"
 import { DatePickerDemo } from "@/components/ui/datepicker"
-import Tablemob from "@components/Demo/table-mob"
+import Tablemob from "@components/Demo/TableMob"
 
 //Card Colors Images
 import green from "@/assets/Cards/green.png"
@@ -66,7 +66,7 @@ const Dashboard = () => {
         <div>
           <Card>
             <CardTitle>Total Users</CardTitle>
-            <div className="flex flex-wrap   md:justify-between justify-center gap-4">
+            <div className="flex flex-wrap md:flex-nowarap md:justify-between justify-center gap-4">
               <Smallcolorcards cardcolor={green} />
               <Smallcolorcards cardcolor={red} />
               <Smallcolorcards cardcolor={violet} />
@@ -74,7 +74,7 @@ const Dashboard = () => {
             </div>
           </Card>
           {!isMobile && (
-            <div className="flex flex-wrap gap-4 mt-4">
+            <div className="flex gap-4 mt-4">
               <Smallcards />
               <Smallcards />
               <Smallcards />
@@ -83,8 +83,8 @@ const Dashboard = () => {
           )}
         </div>
         {!isMobile && (
-          <Card className="flex flex-col flex-1">
-            <div className="flex justify-between">
+          <Card className="flex flex-col flex-grow justify-center">
+            <div className="flex  justify-between">
               <CardTitle>Ticket Status</CardTitle>
             </div>
             <CardContent>
@@ -96,9 +96,14 @@ const Dashboard = () => {
                       { id: 1, value: 15, label: "series B" },
                       { id: 2, value: 20, label: "series C" },
                     ],
+                    highlightScope: { faded: "global", highlighted: "item" },
+                    faded: {
+                      innerRadius: 30,
+                      additionalRadius: -30,
+                      color: "gray",
+                    },
                   },
                 ]}
-                width={400}
                 height={200}
               />
             </CardContent>

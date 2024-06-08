@@ -9,15 +9,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { ChevronRight } from "lucide-react"
-
+import { ChevronRight, User } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
 
 export default function Sidebar({ children }) {
   const { expanded } = useContext(SidebarContext)
+  const { authToken } = useAuth()
 
   return (
     <aside className="h-screen p-8 pr-4">
-      <nav className=" h-full flex flex-col bg-white border border-[gold] dark:border-[gray] rounded-3xl shadow-xl dark:bg-[#181818]">
+      <nav className=" h-full  flex flex-col bg-white border-2 border-[gold] dark:border-[gray] rounded-3xl shadow-xl dark:bg-[#181818]">
         <div className="p-4 pb-2 flex justify-between items-center">
           <img
             src={logo}
@@ -30,24 +31,44 @@ export default function Sidebar({ children }) {
 
         <ul className="flex-1 px-3 ">{children}</ul>
 
-        <div className=" flex p-3">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt=""
-            className="w-10 h-10 rounded-md"
-          />
-          <div
-            className={`
+        {authToken ? (
+          <div className=" flex p-3">
+            <img
+              src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+              alt=""
+              className="w-10 h-10 rounded-md"
+            />
+            <Link
+              to="/profile"
+              className={`
               flex justify-between items-center
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
-          >
-            <div className="leading-4">
-              <h4 className="font-semibold">John Doe</h4>
-              <span className="text-xs text-gray-600">johndoe@gmail.com</span>
-            </div>
+            >
+              <div className="leading-4">
+                <h4 className="font-semibold">John Doe</h4>
+                <span className="text-xs text-gray-600">
+                  {authToken.user_email}
+                </span>
+              </div>
+            </Link>
           </div>
-        </div>
+        ) : (
+          <div className=" flex p-3 ">
+            <User size={24} strokeWidth={1.5} />
+            <Link
+              to="/login"
+              className={`
+              flex justify-between items-center
+              overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
+          `}
+            >
+              <div className="leading-4">
+                <h4 className="font-semibold">Login</h4>
+              </div>
+            </Link>
+          </div>
+        )}
       </nav>
     </aside>
   )
@@ -89,7 +110,7 @@ export function SidebarSubItem({
                   expanded ? "w-52 ml-3" : "w-0"
                 }`}
               >
-                {as ? <as to={to}>{text}</as> : <span>{text}</span>}
+                <span>{text}</span>
               </span>
               {alert && (
                 <div
@@ -116,7 +137,10 @@ export function SidebarSubItem({
         {expanded && submenus && (
           <AccordionContent className="flex flex-col items-start justify-start">
             {submenus.map((submenu, index) => (
-              <ul className="flex-1 px-3 flex flex-col items-center justify-center">
+              <ul
+                className="flex-1 px-3 flex flex-col items-center justify-center"
+                key={index}
+              >
                 <Link
                   to={submenu.to}
                   key={index}
