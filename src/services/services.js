@@ -37,6 +37,14 @@ class Services {
     })
   }
 
+  editCustomers(authToken, id, data) {
+    return http.patch(`api/v1/customers/${id}/`, data, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
   getProducts(authToken) {
     return http.get("api/v1/products", {
       headers: {

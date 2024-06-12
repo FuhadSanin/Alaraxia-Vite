@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import ModalAssign from "./ModalAssign"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 
@@ -19,6 +19,7 @@ const TicketView = () => {
   const { authToken } = useAuth()
   const [customer, setCustomer] = useState([])
   const [product, setProduct] = useState([])
+  const [ticket, setTicket] = useState([])
   const Demotickets = [
     {
       ticketId: "TKT-2024-001",
@@ -46,6 +47,7 @@ const TicketView = () => {
     Services.getTickets(authToken)
       .then(response => {
         const ticket = response.data.results.find(ticket => ticket.uuid === id)
+        setTicket(ticket)
         if (ticket) {
           Services.getCustomersById(authToken, ticket.customer)
             .then(response => {
@@ -107,9 +109,13 @@ const TicketView = () => {
         <Card className="w-full md:w-1/2">
           <CardContent className="flex justify-between items-center">
             <h6 className="font-bold">Customer Details</h6>
-            <Button variant="blue" className="h-7">
-              Edit
-            </Button>
+            <Link
+              to={`/customer/edit/customerid/${customer.uuid}/ticketid/${id}`}
+            >
+              <Button variant="blue" className="h-7">
+                Edit
+              </Button>
+            </Link>
           </CardContent>
           <hr />
           <CardContent className="mt-2">
@@ -118,23 +124,23 @@ const TicketView = () => {
                 <tbody>
                   <tr>
                     <CardDescription>Address</CardDescription>
-                    <td className="text-right">{customer.address || "N/A"}</td>
+                    <td className="text-right">{ticket.address || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>PIN Code</CardDescription>
-                    <td className="text-right">{customer.pinCode || "N/A"}</td>
+                    <td className="text-right">{ticket.pinCode || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Street</CardDescription>
-                    <td className="text-right">{customer.address || "N/A"}</td>
+                    <td className="text-right">{ticket.address || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Location</CardDescription>
-                    <td className="text-right">{customer.location || "N/A"}</td>
+                    <td className="text-right">{ticket.location || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Landmark</CardDescription>
-                    <td className="text-right">{customer.landmark || "N/A"}</td>
+                    <td className="text-right">{ticket.landmark || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Country</CardDescription>
@@ -158,12 +164,12 @@ const TicketView = () => {
                   </tr>
                   <tr>
                     <CardDescription>Dealer’s name</CardDescription>
-                    <td className="text-right">{customer.dealer || "N/A"}</td>
+                    <td className="text-right">{ticket.dealer || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Created On</CardDescription>
                     <td className="text-right">
-                      {customer.created_at || "N/A"}
+                      {customer.created_at.slice(0, 10) || "N/A"}
                     </td>
                   </tr>
                 </tbody>
@@ -175,9 +181,6 @@ const TicketView = () => {
         <Card className="w-full md:w-1/2">
           <CardContent className="flex justify-between items-center">
             <h6 className="font-bold">Product Details</h6>
-            <Button variant="blue" className="h-7">
-              Edit
-            </Button>
           </CardContent>
           <hr />
           <CardContent className="mt-2">
@@ -201,47 +204,47 @@ const TicketView = () => {
                   <tr>
                     <CardDescription>Customer remarks</CardDescription>
                     <td className="text-right">
-                      {customer.customer_remark || "N/A"}
+                      {ticket.customer_remarks || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Call type</CardDescription>
-                    <td className="text-right">
-                      {customer.call_type || "N/A"}
-                    </td>
+                    <td className="text-right">{ticket.call_type || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Service type</CardDescription>
                     <td className="text-right">
-                      {customer.serviceType || "N/A"}
+                      {ticket.service_type || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Warranty flag</CardDescription>
                     <td className="text-right">
-                      {customer.warrantyFlag || "N/A"}
+                      {ticket.warranty_flag || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Customer Demand</CardDescription>
-                    <td className="text-right">{customer.demand || "N/A"}</td>
+                    <td className="text-right">
+                      {ticket.customer_demand || "N/A"}
+                    </td>
                   </tr>
                   <tr>
                     <CardDescription>Service Requested By</CardDescription>
                     <td className="text-right">
-                      {customer.serviceRequestedBy || "N/A"}
+                      {ticket.service_requested_by || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Appointment date</CardDescription>
                     <td className="text-right">
-                      {customer.appointmentDate || "N/A"}
+                      {ticket.created_at.slice(0, 10) || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Appointment Time</CardDescription>
                     <td className="text-right">
-                      {customer.appointmentTime || "N/A"}
+                      {ticket.created_at.slice(11, 16) || "N/A"}
                     </td>
                   </tr>
                 </tbody>

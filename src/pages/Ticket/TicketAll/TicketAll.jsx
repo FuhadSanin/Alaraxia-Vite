@@ -39,7 +39,6 @@ import {
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
 
-
 const Ticket = () => {
   const Demotickets = [
     {
@@ -71,6 +70,15 @@ const Ticket = () => {
         })
     }
   }, [authToken])
+
+  const locationMap = {
+    "2741c98b-1313-45f5-aa70-26db4227ccec": "Hyderabad",
+    "a9f48006-34b5-463f-a248-c7667ecd5b9f": "Kochi",
+    "ecfe9b23-2c68-47e7-958b-3bd41c38ae04": "Bangalore",
+    "66b42480-c555-4a83-934b-0a141b293c87": "Pune",
+    "535be272-42ba-4872-8387-765b5a48bf2f": "Delhi",
+    "4cbe3249-cb95-472f-8006-4ae6ea52953b": "Mumbai",
+  }
 
   const itemsPerPage = 3
   const totalPages = Math.ceil(tickets.length / itemsPerPage)
@@ -185,7 +193,7 @@ const Ticket = () => {
                         <TableCell>{ticket.product_name}</TableCell>
                         <TableCell>{ticket.call_type}</TableCell>
                         <TableCell>{ticket.created_at.slice(0, 10)}</TableCell>
-                        <TableCell>{ticket.location}</TableCell>
+                        <TableCell>{locationMap[ticket.location]}</TableCell>
                         {ticket.ticket_status === 1 ? (
                           <TableCell>
                             <Button variant="pending">Pending</Button>

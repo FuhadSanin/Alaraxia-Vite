@@ -22,6 +22,11 @@ import { useToast } from "@components/ui/use-toast"
 const TicketAdd = () => {
   const [active, setActive] = useState(1)
   const [customerUuid, setCustomerUuid] = useState("")
+  const [locationData, setLocationData] = useState({
+    address: "",
+    location: "",
+    landmark: "",
+  })
 
   return (
     <div className="container mx-auto p-4">
@@ -54,9 +59,14 @@ const TicketAdd = () => {
             <CustomerDetails
               setActive={setActive}
               setCustomerUuid={setCustomerUuid}
+              setLocationData={setLocationData}
             />
           ) : (
-            <Product setActive={setActive} customerUuid={customerUuid} />
+            <Product
+              setActive={setActive}
+              customerUuid={customerUuid}
+              locationData={locationData}
+            />
           )}
         </CardContent>
       </Card>
@@ -66,7 +76,7 @@ const TicketAdd = () => {
 
 export default TicketAdd
 
-const CustomerDetails = ({ setActive, setCustomerUuid }) => {
+const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
   const { authToken } = useAuth()
   const [location, setLocation] = useState([])
   const { toast } = useToast()
@@ -88,9 +98,9 @@ const CustomerDetails = ({ setActive, setCustomerUuid }) => {
 
   const CustomerSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    address: z.string().min(1, "Address is required"),
     landmark: z.string().min(1, "Landmark is required"),
-    state: z.string().min(1, "State is required"),
+    house_no: z.string().min(1, "House no is required"),
+    street: z.string().min(1, "Street is required"),
     email: z.string().email("Invalid email address"),
     phone_number: z.string().min(1, "Primary contact information is required"),
     secondary_contact_number: z.string().optional(),
@@ -101,9 +111,9 @@ const CustomerDetails = ({ setActive, setCustomerUuid }) => {
     resolver: zodResolver(CustomerSchema),
     defaultValues: {
       name: "",
-      address: "",
+      house_no: "",
+      street: "",
       landmark: "",
-      state: "",
       email: "",
       phone_number: "",
       secondary_contact_number: "",
@@ -112,13 +122,24 @@ const CustomerDetails = ({ setActive, setCustomerUuid }) => {
   })
 
   const onSubmit = data => {
-    console.log("data", data)
+    setLocationData({
+      address: `${data.house_no}, ${data.street}`,
+      location: data.location,
+      landmark: data.landmark,
+    })
+
+    data = {
+      name: data.name,
+      email: data.email,
+      phone_number: data.phone_number,
+      secondary_contact_number: data.secondary_contact_number,
+    }
     try {
       Services.createCustomers(authToken, data)
         .then(response => {
           toast({
-            title: "Success! Customer created successfully.",
-            description: "Customer created successfully.",
+            title: "Success! Customer  created successfully.",
+            description: `${response.data.customer_id} Customer created successfully.`,
             variant: "success",
           })
           setActive(2)
@@ -157,7 +178,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid }) => {
         />
         <FormField
           control={form.control}
-          name="state"
+          name="house_no"
           render={({ field }) => (
             <FormItem>
               <FormLabel>House no</FormLabel>
@@ -169,7 +190,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid }) => {
         />
         <FormField
           control={form.control}
-          name="address"
+          name="street"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Street</FormLabel>
@@ -251,7 +272,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid }) => {
   )
 }
 
-const Product = ({ customerUuid }) => {
+const Product = ({ customerUuid, locationData }) => {
   const { authToken } = useAuth()
   const { control, watch } = useForm()
   const navigate = useNavigate()
@@ -367,18 +388,6 @@ const Product = ({ customerUuid }) => {
       return
     }
 
-    const {
-      dealer,
-      customer_remarks,
-      call_type,
-      service_type,
-      warranty_flag,
-      customer_demand,
-      service_requested_by,
-      appointment_date,
-      appointment_time,
-    } = data
-
     const product = modelNumberList.find(
       item => item.model_number === modelNumber
     )
@@ -387,16 +396,20 @@ const Product = ({ customerUuid }) => {
     const newData = {
       product: productUuid,
       customer: customerUuid,
-      dealer,
-      customer_remarks,
-      call_type,
-      service_type,
-      warranty_flag,
-      customer_demand,
-      service_requested_by,
-      appointment_date,
-      appointment_time,
+      dealer: data.dealer,
+      customer_remarks: data.customer_remarks,
+      call_type: data.call_type,
+      service_type: data.service_type,
+      warranty_flag: data.warranty_flag,
+      customer_demand: data.customer_demand,
+      service_requested_by: data.service_requested_by,
+      appointment_date: data.appointment_date,
+      appointment_time: data.appointment_time,
+      location: locationData.location,
+      address: locationData.address,
+      landmark: locationData.landmark,
     }
+    console.log("newData", newData)
 
     Services.createTickets(authToken, newData)
       .then(response => {

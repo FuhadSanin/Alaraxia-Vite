@@ -14,6 +14,7 @@ import Reports from "@pages/Report/Reports"
 import TicketAdd from "@pages/Ticket/TicketAll/TicketAdd"
 import TicketView from "@pages/Ticket/TicketAll/TicketView"
 import { Button } from "@components/ui/button"
+import CustomerEdit from "@pages/Ticket/TicketAll/CustomerEdit"
 
 function App() {
   const { authToken } = useAuth()
@@ -67,7 +68,10 @@ function App() {
             <Route path="/ticket" element={<Ticket title="Open Tickets" />} />
             <Route path="/ticket/add" element={<TicketAdd />} />
             <Route path="/ticket/view/:id" element={<TicketView />} />
-
+            <Route
+              path="/customer/edit/customerid/:customerId/ticketid/:ticketId"
+              element={<CustomerEdit />}
+            />
             {/* Management */}
             <Route
               path="/management"
