@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -23,9 +24,6 @@ import { Plus } from "lucide-react"
 import add from "@/assets/Modals/addPeople.png"
 import { Input } from "@/components/ui/input"
 import { Link, useNavigate } from "react-router-dom"
-import Services from "@services/services"
-import { useAuth } from "@context/AuthContext"
-import { useToast } from "@components/ui/use-toast"
 
 // Define the form schema using Zod
 const FormSchema = z.object({
@@ -35,8 +33,6 @@ const FormSchema = z.object({
 
 const TicketAddForm = () => {
   const navigate = useNavigate()
-  const { toast } = useToast()
-  const { authToken } = useAuth()
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -44,35 +40,10 @@ const TicketAddForm = () => {
       name: "",
     },
   })
-  const fetchData = async (id, name) => {
-    if (authToken) {
-      try {
-        const response = await Services.getCustomersByCustomerIdAndName(
-          authToken,
-          id,
-          name
-        )
-        if (response.data.count === 1) {
-          navigate(`/ticket/add`)
-        } else {
-          toast({
-            title: "Customer not found",
-            description: "Please check the customer ID and name",
-            variant: "destructive",
-          })
-        }
-      } catch (error) {
-        console.error("Error fetching tickets:", error)
-      }
-    }
-  }
 
   const onSubmit = data => {
-    try {
-      fetchData(data.id, data.name)
-    } catch (error) {
-      console.error("Error fetching tickets:", error)
-    }
+    console.log(data)
+    navigate("/ticket/add")
   }
 
   return (
@@ -116,7 +87,7 @@ const TicketAddForm = () => {
   )
 }
 
-const ModalAddDemo = () => {
+const ModalUserAdd = () => {
   const [customerType, setCustomerType] = useState("")
 
   const handleCustomerTypeChange = event => {
@@ -128,7 +99,7 @@ const ModalAddDemo = () => {
       <Dialog>
         <DialogTrigger>
           <Button variant="blue">
-            Add a new Ticket{" "}
+            Add User
             <span className="ml-2">
               <Plus strokeWidth={1.2} />
             </span>
@@ -138,14 +109,14 @@ const ModalAddDemo = () => {
           <img
             src={add}
             alt=""
-            width={80}
-            height={80}
+            width={100}
+            height={100}
             className="self-center "
           />
           <DialogHeader>
-            <DialogTitle className="mb-5">Is the customer...</DialogTitle>
+            <DialogTitle>Is the customer...</DialogTitle>
             <p className="text-left">Customer type</p>
-            <div className="flex items-center space-x-2 pt-2 pb-5">
+            <div className="flex items-center space-x-2 pt-2 pb-2">
               <input
                 type="radio"
                 id="new-customer"
@@ -183,9 +154,7 @@ const ModalAddDemo = () => {
             ) : (
               customerType === "new" && (
                 <Link to="/ticket/add">
-                  <Button variant="blue" className="w-full">
-                    Continue
-                  </Button>
+                  <Button variant="blue">Continue</Button>
                 </Link>
               )
             )}
@@ -196,4 +165,4 @@ const ModalAddDemo = () => {
   )
 }
 
-export default ModalAddDemo
+export default ModalUserAdd

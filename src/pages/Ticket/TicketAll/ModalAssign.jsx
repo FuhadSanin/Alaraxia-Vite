@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -17,34 +17,61 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { SelectDemo } from "@/components/Demo/SelectDemo"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useParams } from "react-router-dom"
+import Services from "@services/services"
+import { useAuth } from "@context/AuthContext"
+import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
-
 // Define the form schema using Zod
 const FormSchema = z.object({
-  technician: z.string().min(1, "Technician is required"),
-  scheduleDate: z.string().min(1, "Schedule Date is required"),
-  fromTime: z.string().min(1, "From Time is required"),
-  toTime: z.string().min(1, "To Time is required"),
+  assignee: z.string().min(1, "Technician is required"),
+  scheduled_date: z.string().min(1, "Schedule Date is required"),
+  from_time: z.string().min(1, "From Time is required"),
+  to_time: z.string().min(1, "To Time is required"),
 })
 
-const TicketAddForm = () => {
+const TicketAddForm = ({ technicians, id, title }) => {
   const navigate = useNavigate()
+  const { authToken } = useAuth()
+  const { toast } = useToast()
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      technician: "",
-      scheduleDate: "",
-      fromTime: "",
-      toTime: "",
+      assignee: "",
+      scheduled_date: "",
+      from_time: "",
+      to_time: "",
     },
   })
 
   const onSubmit = data => {
     console.log(data)
-    navigate("/ticket/add")
+    try {
+      Services.assignTech(authToken, id, data)
+        .then(response => {
+          console.log(response)
+          toast({
+            title: "Technician assigned",
+            description: "Technician has been assigned to the ticket",
+            variant: "success",
+          })
+          navigate(`/ticket/view/${id}`)
+        })
+        .catch(error => {
+          console.log(error)
+          toast({
+            title: "Error",
+            description: "Failed to assign technician",
+            variant: "destructive",
+          })
+        })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -55,20 +82,23 @@ const TicketAddForm = () => {
       >
         <FormField
           control={form.control}
-          name="technician"
+          name="assignee"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Technician</FormLabel>
-              <FormControl>
-                <Input type="text" {...field} />
-              </FormControl>
-              <FormMessage />
+              <SelectDemo
+                label="Select Techinician"
+                width={80}
+                options={technicians}
+                value={field.value}
+                onChange={field.onChange}
+              />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="scheduleDate"
+          name="scheduled_date"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Schedule Date</FormLabel>
@@ -80,11 +110,10 @@ const TicketAddForm = () => {
           )}
         />
         <FormLabel>Sheduled Time</FormLabel>
-        <div className="flex">
-          
+        <div className="flex w-full justify-between">
           <FormField
             control={form.control}
-            name="fromTime"
+            name="from_time"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -96,7 +125,7 @@ const TicketAddForm = () => {
           />
           <FormField
             control={form.control}
-            name="toTime"
+            name="to_time"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -107,46 +136,87 @@ const TicketAddForm = () => {
             )}
           />
         </div>
-        <div className="flex gap-4">
-          <Button type="button" variant="gray">
+        <div className="flex gap-4 pt-5">
+          <Button variant="secondary" className="w-1/2" type="button">
             Cancel
           </Button>
-          <Button type="submit" variant="blue">
-            Assign Technician
+          <Button className="w-1/2" type="submit" variant="blue">
+            {title} Technician
           </Button>
         </div>
       </form>
     </Form>
   )
 }
-const ModalAssign = () => {
+const ModalAssign = ({ id: propId, title }) => {
+  const { id: routeId } = useParams()
+  const { authToken } = useAuth()
+  const [ticket, setTicket] = useState(null)
+  const [technicians, setTechnicians] = useState([])
+
+  const id = propId || routeId
+  useEffect(() => {
+    const fetchTicket = async () => {
+      try {
+        const response = await Services.getTicketsById(authToken, id)
+        setTicket(response.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchTicket()
+  }, [authToken, id])
+
+  useEffect(() => {
+    const fetchTechnicians = async () => {
+      try {
+        Services.getUsers(authToken, 1).then(response => {
+          const transformedData = response.data.results.map(item => ({
+            value: item.uuid,
+            label: item.name,
+          }))
+          setTechnicians(transformedData)
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchTechnicians()
+  }, [authToken])
+
   return (
     <>
       <Dialog>
         <DialogTrigger>
-          <Button variant="blue">Assign Technician</Button>
+          <Button variant="blue" className="h-8">
+            {title || "Assign Technician"}
+          </Button>
         </DialogTrigger>
         <DialogContent className="flex flex-col">
           <DialogHeader>
-            <DialogTitle className="mb-3">Assign Technician</DialogTitle>
-            <Card className="mb-5">
+            <DialogTitle className="mb-3">{title} Technician</DialogTitle>
+            <Card className="dark:bg-background ">
               <CardContent className="flex  items-center p-0">
-                <div className="flex flex-col">
-                  <h6 className="font-bold text-left">Hari Menon</h6>
+                <div className="flex flex-col ">
+                  <h6 className="font-bold text-left">
+                    {ticket?.customer_name}
+                  </h6>
                   <ul className="list-none flex  space-x-3">
                     <li className="flex items-center text-gray-500">
                       <span className="text-blue-500 mr-1">&#9679;</span>
-                      ACI-14275
+                      {ticket?.customer_id}
                     </li>
                     <li className="flex items-center text-gray-500">
                       <span className="text-blue-500 mr-1">&#9679;</span>
-                      T-14275
+                      {ticket?.ticket_id}
                     </li>
                   </ul>
                 </div>
               </CardContent>
             </Card>
-            <TicketAddForm />
+            <div className="pt-5">
+              <TicketAddForm technicians={technicians} id={id} title={title} />
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>

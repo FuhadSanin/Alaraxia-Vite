@@ -1,5 +1,6 @@
 // app/Dashboard/Dashboard.js
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { SelectDemo } from "@/components/Demo/SelectDemo"
 import { Card, CardContent } from "@/components/ui/card"
 import { DatePickerDemo } from "@/components/ui/datepicker"
@@ -23,39 +24,41 @@ import {
 } from "@/components/ui/pagination"
 //icons
 import { Plus, Download, Eye, Pencil, EllipsisVertical } from "lucide-react"
+import Services from "@services/services"
+import { useAuth } from "@context/AuthContext"
+import ModalUserAdd from "./ModalUserAdd"
 
-const tickets = [
-  {
-    ticketId: "TID101",
-    customerName: "Hari Menon",
-    productType: "Air Conditioner",
-    dealerName: "Anand Pillai",
-    createdOn: "2024-07-10",
-    location: "Ernakulam",
-    status: "Pending",
-    dealerCode: "C4712",
-    Action: "",
-  },
-  {
-    ticketId: "TID102",
-    customerName: "Hari Menon",
-    productType: "Air Conditioner",
-    dealerName: "Anand Pillai",
-    createdOn: "2024-07-10",
-    location: "Ernakulam",
-    status: "Assigned",
-    dealerCode: "C4712",
-  },
-]
-const Management = ({ title }) => {
-  const headers = Object.keys(tickets[0])
-  const itemsPerPage = 3
+const ManagementStaff = () => {
+  const { authToken } = useAuth()
+  const [users, setUsers] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
 
-  const totalPages = Math.ceil(tickets.length / itemsPerPage)
-  const indexOfLastTicket = currentPage * itemsPerPage
-  const indexOfFirstTicket = indexOfLastTicket - itemsPerPage
-  const currentTickets = tickets.slice(indexOfFirstTicket, indexOfLastTicket)
+  const itemsPerPage = 10
+
+  useEffect(() => {
+    // Fetch users data from API when authToken changes
+    const fetchUsers = async () => {
+      try {
+        const response = await Services.getUsers(authToken)
+        setUsers(response.data.results)
+      } catch (error) {
+        console.error("Error fetching users:", error)
+      }
+    }
+    fetchUsers()
+  }, [authToken])
+  console.log(users)
+
+  // const data = useQuery({
+  //   queryKey: ["users"],
+  //   queryFn: Services.getUsers(authToken),
+  // })
+  // console.log(data)
+  // Pagination logic
+  const indexOfLastUser = currentPage * itemsPerPage
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser)
+  const totalPages = Math.ceil(users.length / itemsPerPage)
 
   const handleNextPage = () => {
     setCurrentPage(currentPage + 1)
@@ -64,11 +67,10 @@ const Management = ({ title }) => {
   const handlePreviousPage = () => {
     setCurrentPage(currentPage - 1)
   }
-
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
-        <h1 className="text-2xl font-bold mb-4">{title}</h1>
+        <h1 className="text-2xl font-bold mb-4">Staff Management</h1>
       </div>
       <Card>
         <CardContent>
@@ -130,12 +132,7 @@ const Management = ({ title }) => {
                 <DatePickerDemo placeholder="To Date" />
               </div>
               <div>
-                <Button variant="blue">
-                  Add a new Ticket{" "}
-                  <span className="ml-2">
-                    <Plus strokeWidth={1.2} />
-                  </span>
-                </Button>
+                <ModalUserAdd />
               </div>
               <div>
                 <Button variant="secondary">
@@ -151,31 +148,27 @@ const Management = ({ title }) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  {headers.map((header, index) => (
-                    <TableHead className="capitalize" key={index}>
-                      {header}
-                    </TableHead>
-                  ))}
+                  <TableCell>Staff Name</TableCell>
+                  <TableCell>User Role</TableCell>
+                  <TableCell>Email Address</TableCell>
+                  <TableCell>Phone</TableCell>
+                  <TableCell>Location</TableCell>
+                  <TableCell>Action</TableCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentTickets.map((ticket, index) => (
+                {currentUsers.map((user, index) => (
                   <TableRow key={index}>
-                    <TableCell>{ticket.ticketId}</TableCell>
-                    <TableCell>{ticket.status}</TableCell>
-                    <TableCell>{ticket.customerName}</TableCell>
-                    <TableCell>{ticket.productType}</TableCell>
-                    <TableCell>{ticket.dealerName}</TableCell>
-                    <TableCell>{ticket.createdOn}</TableCell>
+                    <TableCell>{user.staffName}</TableCell>
+                    <TableCell>{user.userRole}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                    <TableCell>{user.location}</TableCell>
                     <TableCell>
-                      <Button variant="blue">Assign</Button>
-                    </TableCell>
-                    <TableCell>{ticket.dealerCode}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 items-center cursor-pointer">
-                        <Eye strokeWidth={1} size={20} />
-                        <Pencil strokeWidth={1} size={20} />
-                        <EllipsisVertical strokeWidth={1} size={20} />
+                      <div className="flex gap-3 items-center cursor-pointer">
+                        <Eye size={20} />
+                        <Pencil size={20} />
+                        <EllipsisVertical size={20} />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -217,4 +210,4 @@ const Management = ({ title }) => {
   )
 }
 
-export default Management
+export default ManagementStaff

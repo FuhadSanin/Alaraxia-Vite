@@ -34,13 +34,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CallType, LocationMap, TicketStatus } from "@/constants/constants"
 
 // icons
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
+import { Eye, Pencil, EllipsisVertical } from "lucide-react"
+import { LocationMap, CallType } from "@/constants/constants"
+import ModalAssign from "./TicketAll/ModalAssign"
 
-const Ticket = () => {
+const TicketOpen = () => {
   const { authToken } = useAuth()
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
@@ -52,7 +54,7 @@ const Ticket = () => {
     const fetchData = async () => {
       if (authToken) {
         try {
-          const response = await Services.getTickets(authToken)
+          const response = await Services.getTicketsByStatus(authToken, 1)
           setTickets(response.data.results)
           setTimeout(() => {
             setIsLoading(false)
@@ -64,7 +66,6 @@ const Ticket = () => {
         }
       }
     }
-
     fetchData()
   }, [authToken])
 
@@ -88,7 +89,7 @@ const Ticket = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
-        <h1 className="text-2xl font-bold mb-4">All Tickets</h1>
+        <h1 className="text-2xl font-bold mb-4">Open Tickets</h1>
       </div>
       <Card>
         <CardContent className="p-0">
@@ -170,6 +171,7 @@ const Ticket = () => {
                     <TableCell>Created On</TableCell>
                     <TableCell>Location</TableCell>
                     <TableCell>Status</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -213,9 +215,16 @@ const Ticket = () => {
                         <TableCell>{ticket.created_at.slice(0, 10)}</TableCell>
                         <TableCell>{LocationMap[ticket.location]}</TableCell>
                         <TableCell>
-                          <Button className="h-7" variant={TicketStatus[ticket.ticket_status]}>
-                            {TicketStatus[ticket.ticket_status]}
-                          </Button>
+                          <ModalAssign title="Assign" id={ticket.uuid} />
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-3 items-center cursor-pointer">
+                            <Link to={`/ticket/view/${ticket.uuid}`}>
+                              <Eye size={20} />
+                            </Link>
+                            <Pencil size={20} />
+                            <EllipsisVertical size={20} />
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
@@ -319,4 +328,4 @@ const Ticket = () => {
   )
 }
 
-export default Ticket
+export default TicketOpen

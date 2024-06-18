@@ -55,7 +55,7 @@ export function SignIn() {
         .catch(error => {
           toast({
             title: "Uh oh! Something went wrong.",
-            description: "There was a problem with your request.",
+            description: `${error}`,
             variant: "destructive",
           })
           console.error("Error signing in:", error)

@@ -13,6 +13,16 @@ import ModalAssign from "./ModalAssign"
 import { Link, useParams } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
+import {
+  CallType,
+  WarrantyStatus,
+  LocationMap,
+  ServiceType,
+  CustomerDemand,
+} from "@/constants/constants"
+import { ChevronsLeft } from "lucide-react"
+import { PendingReason } from "@/constants/constants"
+import ModalCancel from "./ModalCancel"
 
 const TicketView = () => {
   const { id } = useParams()
@@ -20,6 +30,7 @@ const TicketView = () => {
   const [customer, setCustomer] = useState([])
   const [product, setProduct] = useState([])
   const [ticket, setTicket] = useState([])
+  const [techinician, setTechinician] = useState("")
   const Demotickets = [
     {
       ticketId: "TKT-2024-001",
@@ -72,12 +83,37 @@ const TicketView = () => {
         console.error("Error fetching tickets:", error)
       })
   }, [id])
-  console.log("customer", customer, "product", product)
+
+  useEffect(() => {
+    if (ticket) {
+      const fetchData = async () => {
+        try {
+          const techinician = await Services.getUsersById(
+            authToken,
+            ticket.assignee
+          )
+          setTechinician(techinician.data.name)
+        } catch (error) {
+          console.error("Error fetching data:", error)
+        }
+      }
+      fetchData()
+    }
+  }, [ticket])
 
   return (
     <div className="container mx-auto p-4">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">View Ticket</h1>
+      <div className="mb-4 flex items-center">
+        <Link to="/ticket" className="flex">
+          <ChevronsLeft className="mr-2" />
+        </Link>
+        <h1 className="text-2xl font-bold">
+          View
+          {(ticket.ticket_status === 5 || ticket.ticket_status === 3) && (
+            <span> Pending </span>
+          )}
+          Ticket
+        </h1>
       </div>
       {/* Ticket Details */}
       <Card className="mb-5">
@@ -88,18 +124,37 @@ const TicketView = () => {
               <ul className="list-none flex flex-wrap mb-0 md:space-x-3 space-x-0">
                 <li className="flex items-center text-gray-500">
                   <span className="text-blue-500 mr-1">&#9679;</span>
-                  ACI-14275
+                  {customer.customer_id}
                 </li>
                 <li className="flex items-center text-gray-500">
                   <span className="text-blue-500 mr-1">&#9679;</span>
-                  T-14275
+                  {ticket.ticket_id}
                 </li>
               </ul>
             </div>
           </div>
           <div className="w-full md:w-auto mt-4 md:mt-0">
-            <div className="flex justify-end">
-              <ModalAssign />
+            <div className="flex justify-end ">
+              {ticket.ticket_status !== 3 &&
+                (ticket.ticket_status === 5 ? (
+                  <div className="flex gap-5">
+                    <div>
+                      <ModalAssign title="Reassign" id={ticket.uuid} />
+                    </div>
+                    <div>
+                      <ModalCancel />
+                    </div>
+                  </div>
+                ) : !ticket.assignee ? (
+                  <ModalAssign />
+                ) : (
+                  <div>
+                    <p className="text-right text-xs text-gray-500">
+                      Techinician
+                    </p>
+                    <p className="font-semibold">{techinician}</p>
+                  </div>
+                ))}
             </div>
           </div>
         </CardContent>
@@ -122,21 +177,19 @@ const TicketView = () => {
             {customer && (
               <table className="w-full">
                 <tbody>
-                  <tr>
+                  {/* <tr>
                     <CardDescription>Address</CardDescription>
-                    <td className="text-right">{ticket.address || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <CardDescription>PIN Code</CardDescription>
-                    <td className="text-right">{ticket.pinCode || "N/A"}</td>
-                  </tr>
+                    <td className="text-right">{ticket.house_number || "N/A"}</td>
+                  </tr> */}
                   <tr>
                     <CardDescription>Street</CardDescription>
-                    <td className="text-right">{ticket.address || "N/A"}</td>
+                    <td className="text-right">{ticket.street || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Location</CardDescription>
-                    <td className="text-right">{ticket.location || "N/A"}</td>
+                    <td className="text-right">
+                      {LocationMap[ticket.location] || "N/A"}
+                    </td>
                   </tr>
                   <tr>
                     <CardDescription>Landmark</CardDescription>
@@ -144,7 +197,7 @@ const TicketView = () => {
                   </tr>
                   <tr>
                     <CardDescription>Country</CardDescription>
-                    <td className="text-right">{customer.state || "N/A"}</td>
+                    <td className="text-right">Kerala</td>
                   </tr>
                   <tr>
                     <CardDescription>Contact Information 1</CardDescription>
@@ -169,7 +222,7 @@ const TicketView = () => {
                   <tr>
                     <CardDescription>Created On</CardDescription>
                     <td className="text-right">
-                      {customer.created_at.slice(0, 10) || "N/A"}
+                      {customer.created_at || "N/A"}
                     </td>
                   </tr>
                 </tbody>
@@ -209,24 +262,26 @@ const TicketView = () => {
                   </tr>
                   <tr>
                     <CardDescription>Call type</CardDescription>
-                    <td className="text-right">{ticket.call_type || "N/A"}</td>
+                    <td className="text-right">
+                      {CallType[ticket.call_type] || "N/A"}
+                    </td>
                   </tr>
                   <tr>
                     <CardDescription>Service type</CardDescription>
                     <td className="text-right">
-                      {ticket.service_type || "N/A"}
+                      {ServiceType[ticket.service_type] || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Warranty flag</CardDescription>
                     <td className="text-right">
-                      {ticket.warranty_flag || "N/A"}
+                      {WarrantyStatus[ticket.warranty_flag] || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Customer Demand</CardDescription>
                     <td className="text-right">
-                      {ticket.customer_demand || "N/A"}
+                      {CustomerDemand[ticket.customer_demand] || "N/A"}
                     </td>
                   </tr>
                   <tr>
@@ -237,16 +292,20 @@ const TicketView = () => {
                   </tr>
                   <tr>
                     <CardDescription>Appointment date</CardDescription>
-                    <td className="text-right">
-                      {ticket.created_at.slice(0, 10) || "N/A"}
-                    </td>
+                    <td className="text-right">{ticket.created_at || "N/A"}</td>
                   </tr>
                   <tr>
                     <CardDescription>Appointment Time</CardDescription>
-                    <td className="text-right">
-                      {ticket.created_at.slice(11, 16) || "N/A"}
-                    </td>
+                    <td className="text-right">{ticket.created_at || "N/A"}</td>
                   </tr>
+                  {ticket.ticket_status === 5 && (
+                    <tr>
+                      <CardDescription>Pending Reason</CardDescription>
+                      <td className="text-right text-destructive">
+                        {PendingReason[ticket.pending_reason] || "N/A"}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             )}

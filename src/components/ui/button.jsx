@@ -11,16 +11,20 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive rounded-full text-destructive-foreground hover:bg-destructive/90",
         outline:
           "border rounded-full border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-gray-400 rounded-full text-white hover:bg-gray-400/80",
+        secondary: "bg-gray-500 rounded-full text-white hover:bg-gray-400/80",
         blue: "bg-blue-500 text-white rounded-full hover:bg-blue-500/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        pending: " border-2 border-yellow-500 text-yellow-500 rounded-full ",
-        success:
-          "border-2 border-green-500 text-green-500 rounded-full hover:bg-green-500/80",
+        // Status
+        Pending: " border-2 border-yellow-500 text-yellow-500 rounded-full ",
+        Closed: "border-2 border-green-500 text-green-500 rounded-full",
+        Open: "border-2 rounded-full  border-cyan-500 text-cyan-500",
+        Assigned: "border-2 rounded-full  border-blue-500 text-blue-500",
+        Escalated: "border-2 rounded-full  border-red-500 text-red-500",
+        Cancelled: "border-2 rounded-full  border-gray-500 text-gray-500",
       },
       size: {
         default: "h-10 px-4 py-2",

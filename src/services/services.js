@@ -28,6 +28,13 @@ class Services {
       },
     })
   }
+  getCustomersByCustomerIdAndName(authToken, id, name) {
+    return http.get(`api/v1/customers/?customer_id=${id}&name=${name}`, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
 
   createCustomers(authToken, data) {
     return http.post("api/v1/customers/", data, {
@@ -70,6 +77,51 @@ class Services {
   }
   createTickets(authToken, data) {
     return http.post("api/v1/tickets/", data, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+  getTicketsById(authToken, id) {
+    return http.get(`api/v1/tickets/${id}`, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+  getTicketsByStatus(authToken, status) {
+    return http.get(`api/v1/tickets/?ticket_status=${status}`, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+  cancelTickets(authToken, id, data) {
+    return http.patch(`api/v1/tickets/${id}/cancel/`, data, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
+  assignTech(authToken, id, data) {
+    return http.patch(`api/v1/tickets/${id}/assign/`, data, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+  // ---------------User Management----------------
+  getUsers(authToken, kind) {
+    return http.get(`api/v1/users/?kind=${kind}`, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
+  getUsersById(authToken, id) {
+    return http.get(`api/v1/users/${id}`, {
       headers: {
         Authorization: `${authToken.token}`,
       },

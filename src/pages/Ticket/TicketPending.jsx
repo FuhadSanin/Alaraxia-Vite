@@ -24,7 +24,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import ModalAddDemo from "@/pages/Ticket/TicketAll/ModalTicketAdd"
 import Services from "@services/services"
 import { useAuth } from "@/context/AuthContext"
 import {
@@ -34,13 +33,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CallType, LocationMap, TicketStatus } from "@/constants/constants"
 
 // icons
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
+import { Eye, Pencil } from "lucide-react"
+import { LocationMap, CallType } from "@/constants/constants"
 
-const Ticket = () => {
+const TicketPending = () => {
   const { authToken } = useAuth()
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
@@ -52,7 +52,7 @@ const Ticket = () => {
     const fetchData = async () => {
       if (authToken) {
         try {
-          const response = await Services.getTickets(authToken)
+          const response = await Services.getTicketsByStatus(authToken, 5)
           setTickets(response.data.results)
           setTimeout(() => {
             setIsLoading(false)
@@ -64,7 +64,6 @@ const Ticket = () => {
         }
       }
     }
-
     fetchData()
   }, [authToken])
 
@@ -88,7 +87,7 @@ const Ticket = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
-        <h1 className="text-2xl font-bold mb-4">All Tickets</h1>
+        <h1 className="text-2xl font-bold mb-4">Pending Tickets</h1>
       </div>
       <Card>
         <CardContent className="p-0">
@@ -107,9 +106,6 @@ const Ticket = () => {
                   <DatePickerDemo placeholder="From Date" />
                   <span className="text-gray-600">To</span>
                   <DatePickerDemo placeholder="To Date" />
-                </div>
-                <div>
-                  <ModalAddDemo />
                 </div>
                 <div>
                   <Button variant="secondary">
@@ -167,9 +163,10 @@ const Ticket = () => {
                     <TableCell>Customer Name</TableCell>
                     <TableCell>Product Type</TableCell>
                     <TableCell>Call Type</TableCell>
-                    <TableCell>Created On</TableCell>
                     <TableCell>Location</TableCell>
-                    <TableCell>Status</TableCell>
+                    <TableCell>Ageing</TableCell>
+                    <TableCell>Technicain</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -210,12 +207,15 @@ const Ticket = () => {
                         </TableCell>
                         <TableCell>{ticket.product_name}</TableCell>
                         <TableCell>{CallType[ticket.call_type]}</TableCell>
-                        <TableCell>{ticket.created_at.slice(0, 10)}</TableCell>
                         <TableCell>{LocationMap[ticket.location]}</TableCell>
+                        <TableCell>{ticket.ageing} </TableCell>
+                        <TableCell>{ticket.technician_name}</TableCell>
                         <TableCell>
-                          <Button className="h-7" variant={TicketStatus[ticket.ticket_status]}>
-                            {TicketStatus[ticket.ticket_status]}
-                          </Button>
+                          <div className="flex gap-3 items-center cursor-pointer">
+                            <Link to={`/ticket/view/${ticket.uuid}`}>
+                              <Eye size={20} />
+                            </Link>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
@@ -319,4 +319,4 @@ const Ticket = () => {
   )
 }
 
-export default Ticket
+export default TicketPending

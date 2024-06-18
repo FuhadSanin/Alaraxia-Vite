@@ -1,7 +1,7 @@
 import React, { createContext, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { cn } from "../lib/utils"
-import { Link } from "react-router-dom"
+import { Link, Outlet } from "react-router-dom"
 
 //components
 import Sidebar, { SidebarSubItem } from "@/components/Demo/Sidebar"
@@ -14,8 +14,8 @@ import Navbarmob from "@components/Demo/NavbarMob"
 // Create context
 export const SidebarContext = createContext()
 
-export default function Layout({ children }) {
-  const [expanded, setExpanded] = useState(false)
+export default function Layout() {
+  const [expanded, setExpanded] = useState(true)
   const [active, setActive] = useState("Dashboard")
   const toggleExpanded = () => {
     setExpanded(prevExpanded => !prevExpanded)
@@ -39,7 +39,7 @@ export default function Layout({ children }) {
         {!isMobile && (
           <Sidebar>
             <SidebarSubItem
-              icon={<Home strokeWidth={1} />}
+              icon={<Home size={20} />}
               text="Dashboard"
               active={active === "Dashboard"}
               onClick={() => handleSetActive("Dashboard")}
@@ -47,7 +47,7 @@ export default function Layout({ children }) {
               to="/"
             />
             <SidebarSubItem
-              icon={<Ticket strokeWidth={1} />}
+              icon={<Ticket size={20} />}
               text="Tickets"
               active={active === "Tickets"}
               onClick={() => handleSetActive("Tickets")}
@@ -59,21 +59,47 @@ export default function Layout({ children }) {
                   to: "/ticket",
                 },
                 {
-                  text: "Create Ticket",
-                  to: "/ticket/create",
+                  text: "Open Ticket",
+                  to: "/ticket/open",
+                },
+                {
+                  text: "Assigned Ticket",
+                  to: "/ticket/assigned",
+                },
+                {
+                  text: "Pending Ticket",
+                  to: "/ticket/pending",
+                },
+                {
+                  text: "Cancelled Ticket",
+                  to: "/ticket/cancelled",
+                },
+                {
+                  text: "Closed Ticket",
+                  to: "/ticket/closed",
                 },
               ]}
             />
             <SidebarSubItem
-              icon={<Users strokeWidth={1} />}
+              icon={<Users size={20} />}
               text="User Management"
               active={active === "User Management"}
               onClick={() => handleSetActive("User Management")}
               as={Link}
-              to="/management"
+              to="/management/staff"
+              submenus={[
+                {
+                  text: "Staff Management",
+                  to: "/management/staff",
+                },
+                {
+                  text: "Customer Management",
+                  to: "/management/customer",
+                },
+              ]}
             />
             <SidebarSubItem
-              icon={<ClipboardMinus strokeWidth={1} />}
+              icon={<ClipboardMinus size={20} />}
               text="Reports"
               active={active === "Reports"}
               onClick={() => handleSetActive("Reports")}
@@ -90,7 +116,9 @@ export default function Layout({ children }) {
               <Navbarmob />
             )}
           </div>
-          <div className={isMobile ? "pt-0" : "pt-8"}>{children}</div>
+          <div className={isMobile ? "pt-0" : "pt-8"}>
+            <Outlet />
+          </div>
         </div>
       </SidebarContext.Provider>
     </div>

@@ -123,7 +123,8 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
 
   const onSubmit = data => {
     setLocationData({
-      address: `${data.house_no}, ${data.street}`,
+      house_no: data.house_no,
+      street: data.street,
       location: data.location,
       landmark: data.landmark,
     })
@@ -207,7 +208,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
             <FormItem>
               <FormLabel>Location</FormLabel>
               <SelectDemo
-                label="Select Model Number"
+                label="Select Location"
                 width={80}
                 options={location}
                 value={field.value}
