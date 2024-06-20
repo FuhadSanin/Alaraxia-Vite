@@ -1,6 +1,5 @@
 // app/Dashboard/Dashboard.js
 import React, { useEffect, useState } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { SelectDemo } from "@/components/Demo/SelectDemo"
 import { Card, CardContent } from "@/components/ui/card"
 import { DatePickerDemo } from "@/components/ui/datepicker"

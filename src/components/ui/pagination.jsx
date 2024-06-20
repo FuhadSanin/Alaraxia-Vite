@@ -8,7 +8,10 @@ const Pagination = ({ className, ...props }) => (
   <nav
     role="navigation"
     aria-label="pagination"
-    className={cn("mx-auto flex w-full justify-center", className)}
+    className={cn(
+      "mx-auto rounded-full  flex w-full justify-center",
+      className
+    )}
     {...props}
   />
 )
@@ -17,7 +20,7 @@ Pagination.displayName = "Pagination"
 const PaginationContent = React.forwardRef(({ className, ...props }, ref) => (
   <ul
     ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
+    className={cn("flex flex-row rounded-full items-center gap-1", className)}
     {...props}
   />
 ))
@@ -70,7 +73,10 @@ PaginationNext.displayName = "PaginationNext"
 const PaginationEllipsis = ({ className, ...props }) => (
   <span
     aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
+    className={cn(
+      "flex h-9 w-9  rounded-full items-center justify-center",
+      className
+    )}
     {...props}
   >
     <MoreHorizontal className="h-4 w-4" />

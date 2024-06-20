@@ -99,7 +99,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
   const CustomerSchema = z.object({
     name: z.string().min(1, "Name is required"),
     landmark: z.string().min(1, "Landmark is required"),
-    house_no: z.string().min(1, "House no is required"),
+    house_number: z.string().min(1, "House no is required"),
     street: z.string().min(1, "Street is required"),
     email: z.string().email("Invalid email address"),
     phone_number: z.string().min(1, "Primary contact information is required"),
@@ -111,7 +111,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
     resolver: zodResolver(CustomerSchema),
     defaultValues: {
       name: "",
-      house_no: "",
+      house_number: "",
       street: "",
       landmark: "",
       email: "",
@@ -123,7 +123,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
 
   const onSubmit = data => {
     setLocationData({
-      house_no: data.house_no,
+      house_number: data.house_number,
       street: data.street,
       location: data.location,
       landmark: data.landmark,
@@ -179,7 +179,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
         />
         <FormField
           control={form.control}
-          name="house_no"
+          name="house_number"
           render={({ field }) => (
             <FormItem>
               <FormLabel>House no</FormLabel>
@@ -409,6 +409,8 @@ const Product = ({ customerUuid, locationData }) => {
       location: locationData.location,
       address: locationData.address,
       landmark: locationData.landmark,
+      street: locationData.street,
+      house_number: locationData.house_number,
     }
     console.log("newData", newData)
 

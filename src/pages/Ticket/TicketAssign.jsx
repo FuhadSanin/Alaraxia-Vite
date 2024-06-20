@@ -89,7 +89,7 @@ const TicketAssign = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
-        <h1 className="text-2xl font-bold mb-4">Open Tickets</h1>
+        <h1 className="text-2xl font-bold mb-4">Assigned Tickets</h1>
       </div>
       <Card>
         <CardContent className="p-0">
@@ -160,7 +160,11 @@ const TicketAssign = () => {
             )}
           </div>
           <div className="mb-8">
-            {!isMobile ? (
+            {tickets.length === 0 ? (
+              <div className="flex justify-center items-center h-40">
+                <p className="text-gray-500">No tickets found</p>
+              </div>
+            ) : !isMobile ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -239,7 +243,10 @@ const TicketAssign = () => {
                     <Card className="bg-white p-0 " key={index}>
                       <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
                         <h4>{ticket["ticket_id"]}</h4>
-                        <Link className="bg-white rounded-full text-gray-500 p-1">
+                        <Link
+                          to={`/ticket/view/${ticket.uuid}`}
+                          className="bg-white rounded-full text-gray-500 p-1"
+                        >
                           <ChevronRight size={20} />
                         </Link>
                       </div>

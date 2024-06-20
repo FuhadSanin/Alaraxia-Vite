@@ -103,6 +103,13 @@ class Services {
       },
     })
   }
+  markAsPending(authToken, id, data) {
+    return http.patch(`api/v1/tickets/${id}/pending/`, data, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
 
   assignTech(authToken, id, data) {
     return http.patch(`api/v1/tickets/${id}/assign/`, data, {

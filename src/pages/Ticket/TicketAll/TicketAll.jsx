@@ -1,8 +1,6 @@
-// Dashboard.js
 import React, { useState, useEffect } from "react"
 import { useMediaQuery } from "react-responsive"
 
-// components
 import { Skeleton } from "@/components/ui/skeleton"
 import { SelectDemo } from "@/components/Demo/SelectDemo"
 import { Card, CardContent, CardDescription } from "@/components/ui/card"
@@ -34,9 +32,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CallType, LocationMap, TicketStatus } from "@/constants/constants"
 
-// icons
+import { CallType, LocationMap, TicketStatus } from "@/constants/constants"
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -44,7 +41,7 @@ const Ticket = () => {
   const { authToken } = useAuth()
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  const [isLoading, setIsLoading] = useState(true) // Initial loading state
+  const [isLoading, setIsLoading] = useState(true)
   const [tickets, setTickets] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -56,11 +53,11 @@ const Ticket = () => {
           setTickets(response.data.results)
           setTimeout(() => {
             setIsLoading(false)
-          }, 500)
+          }, 1000)
           console.log("Tickets fetched successfully:", response.data.results)
         } catch (error) {
           console.error("Error fetching tickets:", error)
-          setIsLoading(false) // Set loading to false even on error
+          setIsLoading(false)
         }
       }
     }
@@ -68,21 +65,20 @@ const Ticket = () => {
     fetchData()
   }, [authToken])
 
-  const itemsPerPage = 3
+  const itemsPerPage = 10
   const totalPages = Math.ceil(tickets.length / itemsPerPage)
   const indexOfLastTicket = currentPage * itemsPerPage
   const indexOfFirstTicket = indexOfLastTicket - itemsPerPage
   const currentTickets = Array.isArray(tickets)
     ? tickets.slice(indexOfFirstTicket, indexOfLastTicket)
     : []
+
   const handleNextPage = () => {
-    if (currentPage === totalPages) return
-    setCurrentPage(currentPage + 1)
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
   }
 
   const handlePreviousPage = () => {
-    if (currentPage === 1) return
-    setCurrentPage(currentPage - 1)
+    if (currentPage > 1) setCurrentPage(currentPage - 1)
   }
 
   return (
@@ -132,10 +128,10 @@ const Ticket = () => {
                     <DialogHeader>
                       <DialogTitle className="mb-3">Filter</DialogTitle>
                       <Card className="mb-5">
-                        <CardContent className="flex  items-center p-0">
+                        <CardContent className="flex items-center p-0">
                           <div className="flex flex-col">
                             <h6 className="font-bold text-left">Hari Menon</h6>
-                            <ul className="list-none flex  space-x-3">
+                            <ul className="list-none flex space-x-3">
                               <li className="flex items-center text-gray-500">
                                 <span className="text-blue-500 mr-1">
                                   &#9679;
@@ -159,7 +155,11 @@ const Ticket = () => {
             )}
           </div>
           <div className="mb-8">
-            {!isMobile ? (
+            {tickets.length === 0 ? (
+              <div className="flex justify-center items-center h-40">
+                <p className="text-gray-500">No tickets found</p>
+              </div>
+            ) : !isMobile ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -173,104 +173,91 @@ const Ticket = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell className="pt-5 pb-5">
-                        <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                      </TableCell>
-                      <TableCell className="pt-5 pb-5">
-                        <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                      </TableCell>
-                      <TableCell className="pt-5 pb-5">
-                        <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                      </TableCell>
-                      <TableCell className="pt-5 pb-5">
-                        <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                      </TableCell>
-                      <TableCell className="pt-5 pb-5">
-                        <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                      </TableCell>
-                      <TableCell className="pt-5 pb-5">
-                        <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                      </TableCell>
-                      <TableCell className="pt-5 pb-5">
-                        <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    tickets &&
-                    tickets.map((ticket, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{ticket.ticket_id}</TableCell>
-                        <TableCell className="flex flex-col">
-                          {ticket.customer_name}{" "}
-                          <span className="text-[13px] text-gray-500">
-                            {ticket.customer_id}
-                          </span>
-                        </TableCell>
-                        <TableCell>{ticket.product_name}</TableCell>
-                        <TableCell>{CallType[ticket.call_type]}</TableCell>
-                        <TableCell>{ticket.created_at.slice(0, 10)}</TableCell>
-                        <TableCell>{LocationMap[ticket.location]}</TableCell>
-                        <TableCell>
-                          <Button className="h-7" variant={TicketStatus[ticket.ticket_status]}>
-                            {TicketStatus[ticket.ticket_status]}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                  {isLoading
+                    ? Array.from({ length: 3 }).map((_, index) => (
+                        <TableRow key={index}>
+                          {Array.from({ length: 7 }).map((_, cellIndex) => (
+                            <TableCell className="pt-5 pb-5" key={cellIndex}>
+                              <Skeleton className="w-[100px] h-[20px] rounded-full" />
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    : currentTickets.map((ticket, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{ticket.ticket_id}</TableCell>
+                          <TableCell className="flex flex-col">
+                            {ticket.customer_name}{" "}
+                            <span className="text-[13px] text-gray-500">
+                              {ticket.customer_id}
+                            </span>
+                          </TableCell>
+                          <TableCell>{ticket.product_name}</TableCell>
+                          <TableCell>{CallType[ticket.call_type]}</TableCell>
+                          <TableCell>
+                            {ticket.created_at.slice(0, 10)}
+                          </TableCell>
+                          <TableCell>{LocationMap[ticket.location]}</TableCell>
+                          <TableCell>
+                            <Button
+                              className="h-7"
+                              variant={TicketStatus[ticket.ticket_status]}
+                            >
+                              {TicketStatus[ticket.ticket_status]}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                 </TableBody>
               </Table>
             ) : (
               <div className="w-full flex flex-col gap-5">
-                {tickets &&
-                  tickets.map((ticket, index) => (
-                    <Card className="bg-white p-0 " key={index}>
-                      <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
-                        <h4>{ticket["ticket_id"]}</h4>
-                        <Link className="bg-white rounded-full text-gray-500 p-1">
-                          <ChevronRight size={20} />
-                        </Link>
-                      </div>
-                      <CardContent>
-                        <table className="w-full">
-                          <tbody>
-                            <tr>
-                              <CardDescription>Name</CardDescription>
-                              <td className="text-right">
-                                {ticket.customer_name || "N/A"}
-                              </td>
-                            </tr>
-                            <tr>
-                              <CardDescription>Product Type</CardDescription>
-                              <td className="text-right">
-                                {ticket.product_name || "N/A"}
-                              </td>
-                            </tr>
-                            <tr>
-                              <CardDescription>CallType</CardDescription>
-                              <td className="text-right">
-                                {ticket.call_type || "N/A"}
-                              </td>
-                            </tr>
-                            <tr>
-                              <CardDescription>Location</CardDescription>
-                              <td className="text-right">
-                                {ticket.location || "N/A"}
-                              </td>
-                            </tr>
-                            <tr>
-                              <CardDescription>Landmark</CardDescription>
-                              <td className="text-right">
-                                {ticket.landmark || "N/A"}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </CardContent>
-                    </Card>
-                  ))}
+                {tickets.map((ticket, index) => (
+                  <Card className="bg-white p-0" key={index}>
+                    <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
+                      <h4>{ticket.ticket_id}</h4>
+                      <Link className="bg-white rounded-full text-gray-500 p-1">
+                        <ChevronRight size={20} />
+                      </Link>
+                    </div>
+                    <CardContent>
+                      <table className="w-full">
+                        <tbody>
+                          <tr>
+                            <CardDescription>Name</CardDescription>
+                            <td className="text-right">
+                              {ticket.customer_name || "N/A"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <CardDescription>Product Type</CardDescription>
+                            <td className="text-right">
+                              {ticket.product_name || "N/A"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <CardDescription>CallType</CardDescription>
+                            <td className="text-right">
+                              {ticket.call_type || "N/A"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <CardDescription>Location</CardDescription>
+                            <td className="text-right">
+                              {ticket.location || "N/A"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <CardDescription>Landmark</CardDescription>
+                            <td className="text-right">
+                              {ticket.landmark || "N/A"}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </div>

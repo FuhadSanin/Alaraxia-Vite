@@ -84,7 +84,8 @@ export function SidebarSubItem({
   to,
   submenus,
 }) {
-  const { expanded } = useContext(SidebarContext)
+  const { expanded, activeSubmenu, setActiveSubmenu } =
+    useContext(SidebarContext)
 
   return (
     <Accordion type="single" collapsible>
@@ -94,15 +95,15 @@ export function SidebarSubItem({
             <li
               to={to}
               className={`
-              relative flex items-center py-2 px-3 my-1
-              font-normal text-sm rounded-full cursor-pointer
-               group
+                relative flex items-center py-2 px-3 my-1
+                font-normal text-sm rounded-full cursor-pointer
+                group
                 ${
-                  active // Check for activeSubMenu
-                    ? " from-indigo-200 to-indigo-100 text-white bg-[#0C2556]"
-                    : "hover:bg-indigo-50 text-gray-600"
+                  active
+                    ? "from-indigo-200 to-indigo-100 text-white bg-[#0C2556]"
+                    : "hover:bg-blue-50 text-gray-600 dark:text-white dark:hover:bg-gray-800"
                 }
-            `}
+              `}
             >
               {icon}
               <span
@@ -122,11 +123,11 @@ export function SidebarSubItem({
               {!expanded && (
                 <div
                   className={`
-          absolute left-full rounded-md px-2 py-1 ml-6
-          bg-indigo-100 text-indigo-800 text-sm
-          invisible opacity-20 -translate-x-3 transition-all
-          group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
-      `}
+                    absolute left-full rounded-md px-2 py-1 ml-6
+                    bg-indigo-100 text-indigo-800 text-sm
+                    invisible opacity-20 -translate-x-3 transition-all
+                    group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+                  `}
                 >
                   {text}
                 </div>
@@ -144,7 +145,12 @@ export function SidebarSubItem({
                 <Link
                   to={submenu.to}
                   key={index}
-                  className={`flex  gap-2 items-start justify-start  p-2`}
+                  onClick={() => setActiveSubmenu(submenu.text)}
+                  className={`flex gap-2 items-start justify-start p-2 ${
+                    activeSubmenu === submenu.text
+                      ? "text-blue-500"
+                      : "text-gray-600 dark:text-white"
+                  }`}
                 >
                   <ChevronRight size={20} strokeWidth={1} />
                   <span className="text-md">{submenu.text}</span>

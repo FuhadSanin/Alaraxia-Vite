@@ -1,7 +1,7 @@
-import React, { createContext, useState } from "react"
+import React, { createContext, useState, useEffect } from "react"
 import { useMediaQuery } from "react-responsive"
 import { cn } from "../lib/utils"
-import { Link, Outlet } from "react-router-dom"
+import { Link, Outlet, useLocation } from "react-router-dom"
 
 //components
 import Sidebar, { SidebarSubItem } from "@/components/Demo/Sidebar"
@@ -15,26 +15,65 @@ import Navbarmob from "@components/Demo/NavbarMob"
 export const SidebarContext = createContext()
 
 export default function Layout() {
+  const location = useLocation()
   const [expanded, setExpanded] = useState(true)
-  const [active, setActive] = useState("Dashboard")
+  const [active, setActive] = useState("")
+  const [activeSubmenu, setActiveSubmenu] = useState("")
+
   const toggleExpanded = () => {
     setExpanded(prevExpanded => !prevExpanded)
   }
 
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  const handleSetActive = menu => {
-    setActive(menu)
-  }
+  useEffect(() => {
+    // Update active and activeSubmenu state based on the current pathname
+    if (location.pathname.startsWith("/ticket")) {
+      setActive("Tickets")
+      const ticketPath = location.pathname.split("/ticket")[1]
+      if (ticketPath.startsWith("/open")) {
+        setActiveSubmenu("Open Ticket")
+      } else if (ticketPath.startsWith("/assigned")) {
+        setActiveSubmenu("Assigned Ticket")
+      } else if (ticketPath.startsWith("/pending")) {
+        setActiveSubmenu("Pending Ticket")
+      } else if (ticketPath.startsWith("/cancelled")) {
+        setActiveSubmenu("Cancelled Ticket")
+      } else if (ticketPath.startsWith("/closed")) {
+        setActiveSubmenu("Closed Ticket")
+      }
+    } else if (location.pathname.startsWith("/management")) {
+      setActive("User Management")
+      const managementPath = location.pathname.split("/management")[1]
+      if (managementPath.startsWith("/staff")) {
+        setActiveSubmenu("Staff Management")
+      } else if (managementPath.startsWith("/customer")) {
+        setActiveSubmenu("Customer Management")
+      }
+    } else if (location.pathname.startsWith("/reports")) {
+      setActive("Reports")
+      setActiveSubmenu("") // No submenus for reports
+    } else {
+      setActive("Dashboard")
+      setActiveSubmenu("") // No submenus for dashboard
+    }
+  }, [location.pathname])
 
   return (
     <div
-      className={cn("h-screen w-full    dark:text-white text-black flex ", {
+      className={cn("h-screen w-full dark:text-white text-black flex", {
         "debug-screens": process.env.NODE_ENV === "development",
       })}
     >
       <SidebarContext.Provider
-        value={{ expanded, toggleExpanded, active, setActive }}
+        value={{
+          expanded,
+          toggleExpanded,
+          active,
+          setActive,
+          activeSubmenu,
+          setActiveSubmenu,
+        }}
       >
         {!isMobile && (
           <Sidebar>
@@ -42,7 +81,7 @@ export default function Layout() {
               icon={<Home size={20} />}
               text="Dashboard"
               active={active === "Dashboard"}
-              onClick={() => handleSetActive("Dashboard")}
+              onClick={() => setActive("Dashboard")}
               as={Link}
               to="/"
             />
@@ -50,33 +89,45 @@ export default function Layout() {
               icon={<Ticket size={20} />}
               text="Tickets"
               active={active === "Tickets"}
-              onClick={() => handleSetActive("Tickets")}
+              onClick={() => setActive("Tickets")}
               as={Link}
               to="/ticket"
               submenus={[
                 {
                   text: "All Tickets",
                   to: "/ticket",
+                  active: activeSubmenu === "All Tickets",
+                  onClick: () => setActiveSubmenu("All Tickets"),
                 },
                 {
                   text: "Open Ticket",
                   to: "/ticket/open",
+                  active: activeSubmenu === "Open Ticket",
+                  onClick: () => setActiveSubmenu("Open Ticket"),
                 },
                 {
                   text: "Assigned Ticket",
                   to: "/ticket/assigned",
+                  active: activeSubmenu === "Assigned Ticket",
+                  onClick: () => setActiveSubmenu("Assigned Ticket"),
                 },
                 {
                   text: "Pending Ticket",
                   to: "/ticket/pending",
+                  active: activeSubmenu === "Pending Ticket",
+                  onClick: () => setActiveSubmenu("Pending Ticket"),
                 },
                 {
                   text: "Cancelled Ticket",
                   to: "/ticket/cancelled",
+                  active: activeSubmenu === "Cancelled Ticket",
+                  onClick: () => setActiveSubmenu("Cancelled Ticket"),
                 },
                 {
                   text: "Closed Ticket",
                   to: "/ticket/closed",
+                  active: activeSubmenu === "Closed Ticket",
+                  onClick: () => setActiveSubmenu("Closed Ticket"),
                 },
               ]}
             />
@@ -84,17 +135,21 @@ export default function Layout() {
               icon={<Users size={20} />}
               text="User Management"
               active={active === "User Management"}
-              onClick={() => handleSetActive("User Management")}
+              onClick={() => setActive("User Management")}
               as={Link}
               to="/management/staff"
               submenus={[
                 {
                   text: "Staff Management",
                   to: "/management/staff",
+                  active: activeSubmenu === "Staff Management",
+                  onClick: () => setActiveSubmenu("Staff Management"),
                 },
                 {
                   text: "Customer Management",
                   to: "/management/customer",
+                  active: activeSubmenu === "Customer Management",
+                  onClick: () => setActiveSubmenu("Customer Management"),
                 },
               ]}
             />
@@ -102,13 +157,13 @@ export default function Layout() {
               icon={<ClipboardMinus size={20} />}
               text="Reports"
               active={active === "Reports"}
-              onClick={() => handleSetActive("Reports")}
+              onClick={() => setActive("Reports")}
               as={Link}
               to="/reports"
             />
           </Sidebar>
         )}
-        <div className={`w-full h-screen ${!isMobile ? "p-7" : "p-2"} `}>
+        <div className={`w-full h-screen ${!isMobile ? "p-7" : "p-2"}`}>
           <div>
             {!isMobile ? (
               <Header expanded={expanded} toggleExpanded={toggleExpanded} />

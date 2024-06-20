@@ -17,7 +17,7 @@ import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 import { useToast } from "@/components/ui/use-toast"
 import close from "@/assets/Modals/close.png"
-import { CancellationReason } from "@/constants/constants"
+import { PendingReason } from "@/constants/constants"
 // Define the form schema using Zod
 const FormSchema = z.object({
   cancellation_reason: z.string().min(1, "Cancel Reason is required"),
@@ -73,7 +73,7 @@ const TicketAddForm = ({ id }) => {
               <SelectDemo
                 label="Select Cancel Reason"
                 width={80}
-                options={CancellationReason}
+                options={PendingReason}
                 value={field.value}
                 onChange={field.onChange}
               />

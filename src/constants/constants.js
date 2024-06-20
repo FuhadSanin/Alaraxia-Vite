@@ -20,20 +20,19 @@ const CustomerDemand = {
   2: "Urgent",
   3: "Normal",
 }
-
-const PendingReason = {
-  1: "Part Not Available",
-  2: "Awaiting customer approval",
-  3: "No Responsible person",
-  4: "Purchase proof awaited",
-  5: "Replacement approval awaited",
-  6: "To be collected to Workshop",
-  7: "Customer Reappointment",
-  8: "Ready for delivery. Waiting for customer to pick up",
-  9: "Customer refused for repairs",
-  10: "Customer refused to give appointment",
-  11: "Product sent to Company for testing",
-}
+const PendingReason = [
+  { value: "1", label: "Part Not Available" },
+  { value: "2", label: "Awaiting customer approval" },
+  { value: "3", label: "No Responsible person" },
+  { value: "4", label: "Purchase proof awaited" },
+  { value: "5", label: "Replacement approval awaited" },
+  { value: "6", label: "To be collected to Workshop" },
+  { value: "7", label: "Customer Reappointment" },
+  { value: "8", label: "Ready for delivery. Waiting for customer to pick up" },
+  { value: "9", label: "Customer refused for repairs" },
+  { value: "10", label: "Customer refused to give appointment" },
+  { value: "11", label: "Product sent to Company for testing" },
+]
 
 const CancellationReason = [
   { value: "1", label: "Customer refused repairs" },

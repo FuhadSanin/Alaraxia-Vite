@@ -23,14 +23,19 @@ import {
 import { ChevronsLeft } from "lucide-react"
 import { PendingReason } from "@/constants/constants"
 import ModalCancel from "./ModalCancel"
+import MarkAsPending from "../TicketClosed/MarkAsPending"
+import CloseTicket from "../TicketClosed/CloseTicket"
+import ImageUpload from "./ImageUpload"
 
 const TicketView = () => {
+  const kind = 1
   const { id } = useParams()
   const { authToken } = useAuth()
-  const [customer, setCustomer] = useState([])
-  const [product, setProduct] = useState([])
-  const [ticket, setTicket] = useState([])
-  const [techinician, setTechinician] = useState("")
+  const [customer, setCustomer] = useState({})
+  const [product, setProduct] = useState({})
+  const [ticket, setTicket] = useState({})
+  const [technician, setTechnician] = useState("")
+
   const Demotickets = [
     {
       ticketId: "TKT-2024-001",
@@ -55,51 +60,52 @@ const TicketView = () => {
   ]
 
   useEffect(() => {
-    Services.getTickets(authToken)
-      .then(response => {
-        const ticket = response.data.results.find(ticket => ticket.uuid === id)
-        setTicket(ticket)
-        if (ticket) {
-          Services.getCustomersById(authToken, ticket.customer)
-            .then(response => {
-              setCustomer(response.data)
-            })
-            .catch(error => {
-              console.error("Error fetching customer:", error)
-            })
+    const fetchData = async () => {
+      try {
+        const ticketResponse = await Services.getTicketsById(authToken, id)
+        const ticketData = ticketResponse.data
+        setTicket(ticketData)
 
-          Services.getProductsById(authToken, ticket.product)
-            .then(response => {
-              setProduct(response.data)
-            })
-            .catch(error => {
-              console.error("Error fetching product:", error)
-            })
-        } else {
-          console.log("Ticket not found")
-        }
-      })
-      .catch(error => {
-        console.error("Error fetching tickets:", error)
-      })
-  }, [id])
+        if (ticketData) {
+          try {
+            const customerResponse = await Services.getCustomersById(
+              authToken,
+              ticketData.customer
+            )
+            setCustomer(customerResponse.data)
+          } catch (error) {
+            console.error("Error fetching customer:", error)
+          }
 
-  useEffect(() => {
-    if (ticket) {
-      const fetchData = async () => {
-        try {
-          const techinician = await Services.getUsersById(
-            authToken,
-            ticket.assignee
-          )
-          setTechinician(techinician.data.name)
-        } catch (error) {
-          console.error("Error fetching data:", error)
+          try {
+            const productResponse = await Services.getProductsById(
+              authToken,
+              ticketData.product
+            )
+            setProduct(productResponse.data)
+          } catch (error) {
+            console.error("Error fetching product:", error)
+          }
+
+          if (ticketData.assignee) {
+            try {
+              const technicianResponse = await Services.getUsersById(
+                authToken,
+                ticketData.assignee
+              )
+              setTechnician(technicianResponse.data.name)
+            } catch (error) {
+              console.error("Error fetching technician:", error)
+            }
+          }
         }
+      } catch (error) {
+        console.error("Error fetching ticket:", error)
       }
-      fetchData()
     }
-  }, [ticket])
+
+    fetchData()
+  }, [id, authToken])
 
   return (
     <div className="container mx-auto p-4">
@@ -119,7 +125,7 @@ const TicketView = () => {
       <Card className="mb-5">
         <CardContent className="flex justify-between items-center">
           <div className="flex flex-col">
-            <h6 className="font-bold ">{customer.name || "Name"}</h6>
+            <h6 className="font-bold">{customer.name || "Name"}</h6>
             <div className="flex flex-wrap items-center mt-2">
               <ul className="list-none flex flex-wrap mb-0 md:space-x-3 space-x-0">
                 <li className="flex items-center text-gray-500">
@@ -135,7 +141,7 @@ const TicketView = () => {
           </div>
           <div className="w-full md:w-auto mt-4 md:mt-0">
             <div className="flex justify-end ">
-              {ticket.ticket_status !== 3 &&
+              {(kind !== 1 || ticket.ticket_status !== 3) &&
                 (ticket.ticket_status === 5 ? (
                   <div className="flex gap-5">
                     <div>
@@ -150,9 +156,9 @@ const TicketView = () => {
                 ) : (
                   <div>
                     <p className="text-right text-xs text-gray-500">
-                      Techinician
+                      Technician
                     </p>
-                    <p className="font-semibold">{techinician}</p>
+                    <p className="font-semibold">{technician}</p>
                   </div>
                 ))}
             </div>
@@ -164,23 +170,27 @@ const TicketView = () => {
         <Card className="w-full md:w-1/2">
           <CardContent className="flex justify-between items-center">
             <h6 className="font-bold">Customer Details</h6>
-            <Link
-              to={`/customer/edit/customerid/${customer.uuid}/ticketid/${id}`}
-            >
-              <Button variant="blue" className="h-7">
-                Edit
-              </Button>
-            </Link>
+            {kind !== 1 && (
+              <Link
+                to={`/customer/edit/customerid/${customer.uuid}/ticketid/${id}`}
+              >
+                <Button variant="blue" className="h-7">
+                  Edit
+                </Button>
+              </Link>
+            )}
           </CardContent>
           <hr />
           <CardContent className="mt-2">
             {customer && (
               <table className="w-full">
                 <tbody>
-                  {/* <tr>
+                  <tr>
                     <CardDescription>Address</CardDescription>
-                    <td className="text-right">{ticket.house_number || "N/A"}</td>
-                  </tr> */}
+                    <td className="text-right">
+                      {ticket.house_number || "N/A"}
+                    </td>
+                  </tr>
                   <tr>
                     <CardDescription>Street</CardDescription>
                     <td className="text-right">{ticket.street || "N/A"}</td>
@@ -250,14 +260,22 @@ const TicketView = () => {
                   </tr>
                   <tr>
                     <CardDescription>Model number</CardDescription>
+                    <td className="text-right">{product.model || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <CardDescription>Warranty status</CardDescription>
                     <td className="text-right">
-                      {product.model_number || "N/A"}
+                      {WarrantyStatus[product.warranty_status] || "N/A"}
                     </td>
                   </tr>
                   <tr>
-                    <CardDescription>Customer remarks</CardDescription>
+                    <CardDescription>Warranty till</CardDescription>
+                    <td className="text-right">{product.warranty || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <CardDescription>Service type</CardDescription>
                     <td className="text-right">
-                      {ticket.customer_remarks || "N/A"}
+                      {ServiceType[ticket.service_type] || "N/A"}
                     </td>
                   </tr>
                   <tr>
@@ -267,91 +285,71 @@ const TicketView = () => {
                     </td>
                   </tr>
                   <tr>
-                    <CardDescription>Service type</CardDescription>
-                    <td className="text-right">
-                      {ServiceType[ticket.service_type] || "N/A"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <CardDescription>Warranty flag</CardDescription>
-                    <td className="text-right">
-                      {WarrantyStatus[ticket.warranty_flag] || "N/A"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <CardDescription>Customer Demand</CardDescription>
+                    <CardDescription>Customer demand</CardDescription>
                     <td className="text-right">
                       {CustomerDemand[ticket.customer_demand] || "N/A"}
                     </td>
                   </tr>
                   <tr>
-                    <CardDescription>Service Requested By</CardDescription>
-                    <td className="text-right">
-                      {ticket.service_requested_by || "N/A"}
-                    </td>
+                    <CardDescription>Reported fault</CardDescription>
+                    <td className="text-right">{ticket.fault || "N/A"}</td>
                   </tr>
-                  <tr>
-                    <CardDescription>Appointment date</CardDescription>
-                    <td className="text-right">{ticket.created_at || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <CardDescription>Appointment Time</CardDescription>
-                    <td className="text-right">{ticket.created_at || "N/A"}</td>
-                  </tr>
-                  {ticket.ticket_status === 5 && (
-                    <tr>
-                      <CardDescription>Pending Reason</CardDescription>
-                      <td className="text-right text-destructive">
-                        {PendingReason[ticket.pending_reason] || "N/A"}
-                      </td>
-                    </tr>
-                  )}
                 </tbody>
               </table>
             )}
           </CardContent>
         </Card>
       </div>
-      {/* Service History */}
-      <Card className="mb-5">
-        <CardTitle> Service History</CardTitle>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableCell>Ticket ID</TableCell>
-                <TableCell>Customer Name</TableCell>
-                <TableCell>Product Type</TableCell>
-                <TableCell>Call Type</TableCell>
-                <TableCell>Created On</TableCell>
-                <TableCell>Location</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {Demotickets.map((ticket, index) => (
-                <TableRow key={index}>
-                  <TableCell>{ticket.ticketId}</TableCell>
-                  <TableCell>{ticket.customerName}</TableCell>
-                  <TableCell>{ticket.productType}</TableCell>
-                  <TableCell>{ticket.callType}</TableCell>
-                  <TableCell>{ticket.createdOn}</TableCell>
-                  <TableCell>{ticket.location}</TableCell>
-                  {ticket.status === "Pending" ? (
-                    <TableCell>
-                      <Button variant="pending">{ticket.status}</Button>
-                    </TableCell>
-                  ) : (
-                    <TableCell>
-                      <Button variant="success">{ticket.status}</Button>
-                    </TableCell>
-                  )}
+      {/* Action Section */}
+      {kind === 1 ? (
+        <>
+          <ImageUpload />
+          <div className="flex justify-between mt-5">
+            <MarkAsPending />
+            <CloseTicket />
+          </div>
+        </>
+      ) : (
+        <Card className="mb-5">
+          <CardTitle> Service History</CardTitle>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableCell>Ticket ID</TableCell>
+                  <TableCell>Customer Name</TableCell>
+                  <TableCell>Product Type</TableCell>
+                  <TableCell>Call Type</TableCell>
+                  <TableCell>Created On</TableCell>
+                  <TableCell>Location</TableCell>
+                  <TableCell>Status</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {Demotickets.map((ticket, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{ticket.ticketId}</TableCell>
+                    <TableCell>{ticket.customerName}</TableCell>
+                    <TableCell>{ticket.productType}</TableCell>
+                    <TableCell>{ticket.callType}</TableCell>
+                    <TableCell>{ticket.createdOn}</TableCell>
+                    <TableCell>{ticket.location}</TableCell>
+                    {ticket.status === "Pending" ? (
+                      <TableCell>
+                        <Button variant="pending">{ticket.status}</Button>
+                      </TableCell>
+                    ) : (
+                      <TableCell>
+                        <Button variant="success">{ticket.status}</Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
