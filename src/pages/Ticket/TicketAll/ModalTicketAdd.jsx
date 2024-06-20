@@ -53,11 +53,16 @@ const TicketAddForm = () => {
           name
         )
         if (response.data.count === 1) {
-          navigate(`/ticket/add`)
+          toast({
+            title: "Customer found",
+            description: "Customer has been found successfully",
+            variant: "success",
+          })
+          navigate(`/ticket/add/${id}/${name}`)
         } else {
           toast({
             title: "Customer not found",
-            description: "Please check the customer ID and name",
+            description: "Please check the customer ID and Name",
             variant: "destructive",
           })
         }
@@ -117,7 +122,7 @@ const TicketAddForm = () => {
 }
 
 const ModalAddDemo = () => {
-  const [customerType, setCustomerType] = useState("")
+  const [customerType, setCustomerType] = useState("new")
 
   const handleCustomerTypeChange = event => {
     setCustomerType(event.target.value)
@@ -147,6 +152,7 @@ const ModalAddDemo = () => {
             <p className="text-left">Customer type</p>
             <div className="flex items-center space-x-2 pt-2 pb-5">
               <input
+                defaultValue={customerType}
                 type="radio"
                 id="new-customer"
                 name="customer-type"

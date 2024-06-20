@@ -65,7 +65,7 @@ const Ticket = () => {
     fetchData()
   }, [authToken])
 
-  const itemsPerPage = 10
+  const itemsPerPage = 3
   const totalPages = Math.ceil(tickets.length / itemsPerPage)
   const indexOfLastTicket = currentPage * itemsPerPage
   const indexOfFirstTicket = indexOfLastTicket - itemsPerPage

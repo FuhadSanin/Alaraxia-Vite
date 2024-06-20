@@ -182,7 +182,7 @@ const TicketView = () => {
           </CardContent>
           <hr />
           <CardContent className="mt-2">
-            {customer && (
+            {ticket && customer && (
               <table className="w-full">
                 <tbody>
                   <tr>
@@ -247,7 +247,7 @@ const TicketView = () => {
           </CardContent>
           <hr />
           <CardContent className="mt-2">
-            {product && (
+            {ticket && product && (
               <table className="w-full">
                 <tbody>
                   <tr>
@@ -260,22 +260,14 @@ const TicketView = () => {
                   </tr>
                   <tr>
                     <CardDescription>Model number</CardDescription>
-                    <td className="text-right">{product.model || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <CardDescription>Warranty status</CardDescription>
                     <td className="text-right">
-                      {WarrantyStatus[product.warranty_status] || "N/A"}
+                      {product.model_number || "N/A"}
                     </td>
                   </tr>
                   <tr>
-                    <CardDescription>Warranty till</CardDescription>
-                    <td className="text-right">{product.warranty || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <CardDescription>Service type</CardDescription>
+                    <CardDescription>Customer remarks</CardDescription>
                     <td className="text-right">
-                      {ServiceType[ticket.service_type] || "N/A"}
+                      {ticket.customer_remarks || "N/A"}
                     </td>
                   </tr>
                   <tr>
@@ -285,15 +277,45 @@ const TicketView = () => {
                     </td>
                   </tr>
                   <tr>
-                    <CardDescription>Customer demand</CardDescription>
+                    <CardDescription>Service type</CardDescription>
+                    <td className="text-right">
+                      {ServiceType[ticket.service_type] || "N/A"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <CardDescription>Warranty flag</CardDescription>
+                    <td className="text-right">
+                      {WarrantyStatus[ticket.warranty_flag] || "N/A"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <CardDescription>Customer Demand</CardDescription>
                     <td className="text-right">
                       {CustomerDemand[ticket.customer_demand] || "N/A"}
                     </td>
                   </tr>
                   <tr>
-                    <CardDescription>Reported fault</CardDescription>
-                    <td className="text-right">{ticket.fault || "N/A"}</td>
+                    <CardDescription>Service Requested By</CardDescription>
+                    <td className="text-right">
+                      {ticket.service_requested_by || "N/A"}
+                    </td>
                   </tr>
+                  <tr>
+                    <CardDescription>Appointment date</CardDescription>
+                    <td className="text-right">{ticket.created_at || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <CardDescription>Appointment Time</CardDescription>
+                    <td className="text-right">{ticket.created_at || "N/A"}</td>
+                  </tr>
+                  {ticket.ticket_status === 5 && (
+                    <tr>
+                      <CardDescription>Pending Reason</CardDescription>
+                      <td className="text-right text-destructive">
+                        {PendingReason[ticket.pending_reason] || "N/A"}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             )}

@@ -110,9 +110,6 @@ const TicketAssign = () => {
                   <DatePickerDemo placeholder="To Date" />
                 </div>
                 <div>
-                  <ModalAddDemo />
-                </div>
-                <div>
                   <Button variant="secondary">
                     Export
                     <span className="ml-2">

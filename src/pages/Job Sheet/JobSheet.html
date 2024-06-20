@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Sheet</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; padding: 20px">
+    <header
+      style="
+        text-align: center;
+        font-weight: bold;
+        text-transform: capitalize;
+        color: #4a5568;
+      "
+    >
+      Tax Invoice
+    </header>
+
+    <section
+      style="
+        margin-top: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        text-transform: capitalize;
+        align-items: center;
+      "
+    >
+      <div style="display: flex; gap: 10px; align-items: center">
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/ed1b1c3465711c771a1bc01f9149a3df8ff13a1b00337d08c4171c4db6487bc4?apiKey=bba37cf791904af7a5bb1426abbd2437&"
+          alt="Company Logo"
+          style="height: 35px; width: 35px"
+        />
+        <div
+          style="display: flex; flex-direction: column; justify-content: center"
+        >
+          <h2 style="font-size: 1.125rem">Ataraxia</h2>
+          <p style="margin-top: 5px; font-size: 12px; color: black">
+            future care Pvt.Ltd
+          </p>
+        </div>
+      </div>
+      <div
+        style="display: flex; flex-direction: column; gap: 5px; font-size: 12px"
+      >
+        <div
+          style="
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            border: 1px solid #1f2937;
+          "
+        >
+          <span style="color: #718096">Job No:</span>
+          <span style="color: #1a202c">JN14752</span>
+        </div>
+        <div
+          style="
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            border: 1px solid #1f2937;
+          "
+        >
+          <span style="color: #718096">Receipt Date:</span>
+          <span style="color: #1a202c">15-06-2024</span>
+        </div>
+        <div
+          style="
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            border: 1px solid #1f2937;
+          "
+        >
+          <span style="color: #718096">Time:</span>
+          <span style="color: #1a202c">01:27</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-top: 20px; width: 100%">
+      <div style="display: flex; gap: 20px">
+        <aside style="display: flex; flex-direction: column; width: 50%">
+          <div
+            style="
+              display: flex;
+              text-align: center;
+              font-size: 12px;
+              gap: 10px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                type="radio"
+                id="radio-Assigned"
+                name="serviceCallType"
+                checked
+                readonly
+              />
+              <label for="radio-Assigned">Assigned</label>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                type="radio"
+                id="radio-Pending"
+                name="serviceCallType"
+                checked
+                readonly
+              />
+              <label for="radio-Pending">Pending</label>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                type="radio"
+                id="radio-Cancel"
+                name="serviceCallType"
+                checked
+                readonly
+              />
+              <label for="radio-Cancel">Cancel</label>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <input
+                type="radio"
+                id="radio-Close"
+                name="serviceCallType"
+                checked
+                readonly
+              />
+              <label for="radio-Close">Close</label>
+            </div>
+          </div>
+
+          <section
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 5px;
+              text-transform: capitalize;
+              margin-top: 10px;
+            "
+          >
+            <h2 style="margin-top: 10px; font-size: 14px; color: #4a5568">
+              Customer Details
+            </h2>
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                padding: 5px;
+                border: 1px solid #1f2937;
+              "
+            >
+              <span style="font-size: 12px; color: #718096">Name:</span>
+              <span style="font-size: 12px; color: #1a202c">John Doe</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                padding: 5px;
+                border: 1px solid #1f2937;
+              "
+            >
+              <span style="font-size: 12px; color: #718096">Address:</span>
+              <span style="font-size: 12px; color: #1a202c">1234 Main St</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                padding: 5px;
+                border: 1px solid #1f2937;
+              "
+            >
+              <span style="font-size: 12px; color: #718096">City:</span>
+              <span style="font-size: 12px; color: #1a202c">Metropolis</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 5px;
+                padding: 5px;
+                border: 1px solid #1f2937;
+              "
+            >
+              <span style="font-size: 12px; color: #718096">Contact No:</span>
+              <span style="font-size: 12px; color: #1a202c">555-1234</span>
+            </div>
+            <h2 style="margin-top: 10px; font-size: 14px; color: #4a5568">
+              Warranty Type
+            </h2>
+            <div
+              style="
+                display: flex;
+                text-align: center;
+                font-size: 12px;
+                gap: 10px;
+                padding: 5px;
+                border: 1px solid #1f2937;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  gap: 5px;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <input
+                  type="radio"
+                  id="radio-I/W"
+                  name="warrantyType"
+                  checked
+                  readonly
+                />
+                <label for="radio-I/W">I/W</label>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 5px;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <input
+                  type="radio"
+                  id="radio-O/W"
+                  name="warrantyType"
+                  checked
+                  readonly
+                />
+                <label for="radio-O/W">O/W</label>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 5px;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <input
+                  type="radio"
+                  id="radio-P"
+                  name="warrantyType"
+                  checked
+                  readonly
+                />
+                <label for="radio-P">P</label>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 5px;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <input
+                  type="radio"
+                  id="radio-A/F"
+                  name="warrantyType"
+                  checked
+                  readonly
+                />
+                <label for="radio-A/F">A/F</label>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 5px;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <input
+                  type="radio"
+                  id="radio-F"
+                  name="warrantyType"
+                  checked
+                  readonly
+                />
+                <label for="radio-F">F</label>
+              </div>
+            </div>
+          </section>
+        </aside>
+
+        <section
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 50%;
+            text-transform: capitalize;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">Product type:</span>
+            <span style="font-size: 12px; color: #1a202c"
+              >Lorem ipsum dolor sit</span
+            >
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">Model/Suffix:</span>
+            <span style="font-size: 12px; color: #1a202c"
+              >Lorem ipsum dolor sit</span
+            >
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">Serial No:</span>
+            <span style="font-size: 12px; color: #1a202c">|</span>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">Purchase Date:</span>
+            <span style="font-size: 12px; color: #1a202c"
+              >Lorem ipsum dolor sit</span
+            >
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096"
+              >SVC Requested by:</span
+            >
+            <span style="font-size: 12px; color: #1a202c"
+              >Lorem ipsum dolor sit</span
+            >
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">Service Type:</span>
+            <span style="font-size: 12px; color: #1a202c">
+              <input
+                type="radio"
+                id="radio-On-site"
+                name="serviceType"
+                class="shrink-0"
+                checked
+              />
+              <label for="radio-On-site" style="font-size: 12px; color: #1a202c"
+                >On-site</label
+              >
+              <input
+                type="radio"
+                id="radio-Wake-In"
+                name="serviceType"
+                class="shrink-0"
+              />
+              <label for="radio-Wake-In" style="font-size: 12px; color: #1a202c"
+                >Wake In</label
+              >
+            </span>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">Call Type:</span>
+            <span style="font-size: 12px; color: #1a202c"
+              >Lorem ipsum dolor sit</span
+            >
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">AMC/Ext Wty No:</span>
+            <span style="font-size: 12px; color: #1a202c">|</span>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 5px;
+              padding: 5px;
+              border: 1px solid #1f2937;
+            "
+          >
+            <span style="font-size: 12px; color: #718096">AMC Period:</span>
+            <span style="font-size: 12px; color: #1a202c; margin-left: 10px">
+              <span style="font-size: 12px; color: #718096">From:</span>
+              <span style="font-size: 12px; color: #1a202c">20-12-24</span>
+              <span style="font-size: 12px; color: #718096">To:</span>
+              <span style="font-size: 12px; color: #1a202c">12-23-25</span>
+            </span>
+          </div>
+        </section>
+      </div>
+      <section
+        style="
+          display: flex;
+          gap: 1rem;
+          padding: 0.25rem;
+          border: 1px solid #4a5568;
+          margin-top: 0.5rem;
+          flex-wrap: wrap;
+        "
+      >
+        <span style="font-size: 0.75rem; color: #718096">Receipt Remarks:</span>
+        <span style="flex: 1; font-size: 0.75rem; color: #1a202c">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua
+        </span>
+      </section>
+
+      <section
+        style="
+          display: flex;
+          gap: 1rem;
+          padding: 0.25rem;
+          border: 1px solid #4a5568;
+          margin-top: 0.5rem;
+        "
+      >
+        <span style="align-self: center; font-size: 0.75rem; color: #718096"
+          >Defect Reported by Engineer:</span
+        >
+        <span style="flex: 1; font-size: 0.75rem; color: #1a202c">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua
+        </span>
+      </section>
+
+      <section
+        style="
+          display: flex;
+          flex-direction: column;
+          padding-bottom: 2.5rem;
+          margin-top: 1rem;
+          width: 100%;
+          font-size: 0.75rem;
+          text-transform: capitalize;
+          border-bottom: 1px solid #edf1f5;
+          color: #718096;
+          max-width: 100%;
+        "
+      >
+        <div style="overflow-x: auto">
+          <table
+            style="
+              width: 100%;
+              background-color: #fff;
+              border-collapse: collapse;
+              border: 1px solid #718096;
+            "
+          >
+            <thead>
+              <tr style="background-color: #f7fafc">
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Visit Details
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Visit Date
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Engineer Name
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  In Time
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Out Time
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Technical Remarks
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Replace with dynamic data rendering logic -->
+              <tr style="text-align: center; border-bottom: 1px solid #718096">
+                <td style="padding: 0.5rem 1rem">Visit 1 Details</td>
+                <td style="padding: 0.5rem 1rem">2024-06-20</td>
+                <td style="padding: 0.5rem 1rem">John Doe</td>
+                <td style="padding: 0.5rem 1rem">09:00 AM</td>
+                <td style="padding: 0.5rem 1rem">05:00 PM</td>
+                <td style="padding: 0.5rem 1rem">Lorem ipsum dolor sit amet</td>
+              </tr>
+              <tr style="text-align: center; border-bottom: 1px solid #718096">
+                <td style="padding: 0.5rem 1rem">Visit 2 Details</td>
+                <td style="padding: 0.5rem 1rem">2024-06-21</td>
+                <td style="padding: 0.5rem 1rem">Jane Smith</td>
+                <td style="padding: 0.5rem 1rem">10:00 AM</td>
+                <td style="padding: 0.5rem 1rem">04:00 PM</td>
+                <td style="padding: 0.5rem 1rem">
+                  Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium doloremque laudantium
+                </td>
+              </tr>
+              <!-- End of dynamic data rendering logic -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section
+        style="
+          display: flex;
+          flex-direction: column;
+          padding-bottom: 2.5rem;
+          margin-top: 1rem;
+          width: 100%;
+          font-size: 0.75rem;
+          text-transform: capitalize;
+          border-bottom: 1px solid #edf1f5;
+          color: #718096;
+        "
+      >
+        <div style="overflow-x: auto">
+          <table
+            style="
+              width: 100%;
+              background-color: #fff;
+              border-collapse: collapse;
+              border: 1px solid #718096;
+            "
+          >
+            <thead>
+              <tr style="background-color: #f7fafc">
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  S
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Part No
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Description
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Quantity
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Unit Price
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Parts Cost
+                </th>
+                <th
+                  style="padding: 0.5rem 1rem; border-bottom: 1px solid #718096"
+                >
+                  Verified By
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Replace with dynamic data rendering logic -->
+              <tr style="text-align: center; border-bottom: 1px solid #718096">
+                <td style="padding: 0.5rem 1rem">1</td>
+                <td style="padding: 0.5rem 1rem">P001</td>
+                <td style="padding: 0.5rem 1rem">Example Part</td>
+                <td style="padding: 0.5rem 1rem">1</td>
+                <td style="padding: 0.5rem 1rem">$100.00</td>
+                <td style="padding: 0.5rem 1rem">$100.00</td>
+                <td style="padding: 0.5rem 1rem">John Doe</td>
+              </tr>
+              <!-- End of dynamic data rendering logic -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section
+        style="
+          display: flex;
+          gap: 0.625rem;
+          justify-content: space-between;
+          padding: 0.125rem 0.25rem;
+          margin-top: 1rem;
+          width: 100%;
+          font-size: 0.75rem;
+          text-transform: capitalize;
+          border: 1px solid #4a5568;
+          color: #718096;
+          flex-wrap: wrap;
+        "
+      >
+        <span>Estimate of Repairs:</span>
+        <span>Signature</span>
+      </section>
+
+      <section
+        style="
+          display: flex;
+          gap: 0.625rem;
+          justify-content: space-between;
+          padding: 0.125rem 0.25rem;
+          margin-top: 0.25rem;
+          width: 100%;
+          font-size: 0.75rem;
+          text-transform: capitalize;
+          border: 1px solid #4a5568;
+          color: #718096;
+          flex-wrap: wrap;
+        "
+      >
+        <span>Customer Approved on Estimation Provided:</span>
+        <span>Signature</span>
+      </section>
+
+      <section
+        style="
+          display: flex;
+          gap: 0.625rem;
+          margin-top: 1rem;
+          font-size: 0.75rem;
+          color: #718096;
+          flex-wrap: wrap;
+        "
+      >
+        <div style="display: flex; flex-direction: column; flex: 1">
+          <span
+            style="
+              justify-content: center;
+              padding: 0.25rem;
+              text-transform: capitalize;
+              border: 1px solid #4a5568;
+            "
+            >Completion Date:</span
+          >
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              padding: 0.25rem;
+              margin-top: 0.25rem;
+              border: 1px solid #4a5568;
+            "
+          >
+            <label for="customer-signature" style="text-transform: capitalize"
+              >Customer Name & Sign:</label
+            >
+            <p
+              id="customer-signature"
+              style="margin-top: 0.125rem; font-size: 0.75rem; color: #000"
+            >
+              I am satisfied with the repairs carried out on my product & the
+              same is working satisfactorily.
+            </p>
+            <span style="margin-top: 0.3125rem; text-transform: capitalize"
+              >Signature: _____________________</span
+            >
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            align-self: flex-start;
+            text-transform: capitalize;
+            white-space: nowrap;
+          "
+        >
+          <span
+            style="
+              justify-content: center;
+              padding: 0.25rem;
+              border: 1px solid #4a5568;
+            "
+            >Engineer:</span
+          >
+          <span
+            style="
+              justify-content: center;
+              padding: 0.25rem;
+              margin-top: 0.25rem;
+              border: 1px solid #4a5568;
+            "
+            >Signature:</span
+          >
+        </div>
+      </section>
+    </section>
+  </body>
+</html>

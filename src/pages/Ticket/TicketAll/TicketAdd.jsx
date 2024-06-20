@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { SelectDemo } from "@components/Demo/SelectDemo"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { useToast } from "@components/ui/use-toast"
 
 const TicketAdd = () => {
@@ -58,6 +58,7 @@ const TicketAdd = () => {
           {active === 1 ? (
             <CustomerDetails
               setActive={setActive}
+              customerUuid={customerUuid}
               setCustomerUuid={setCustomerUuid}
               setLocationData={setLocationData}
             />
@@ -76,10 +77,39 @@ const TicketAdd = () => {
 
 export default TicketAdd
 
-const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
+const CustomerDetails = ({
+  setActive,
+  customerUuid,
+  setCustomerUuid,
+  setLocationData,
+}) => {
+  const { id, name } = useParams()
   const { authToken } = useAuth()
   const [location, setLocation] = useState([])
   const { toast } = useToast()
+  const [existingCustomer, setExistingCustomer] = useState(false)
+
+  useEffect(() => {
+    if (id && name) {
+      const fetchData = async () => {
+        try {
+          const response = await Services.getCustomersByCustomerIdAndName(
+            authToken,
+            id,
+            name
+          )
+          form.setValue("name", response.data.results[0].name)
+          form.setValue("customer_id", response.data.results[0].customer_id)
+          setCustomerUuid(response.data.results[0].uuid)
+          setExistingCustomer(true)
+        } catch (err) {
+          console.error("Error fetching customer data:", err)
+        }
+      }
+
+      fetchData()
+    }
+  }, [authToken, id, name])
 
   useEffect(() => {
     Services.getLocations(authToken)
@@ -122,6 +152,7 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
   })
 
   const onSubmit = data => {
+    console.log(data)
     setLocationData({
       house_number: data.house_number,
       street: data.street,
@@ -136,24 +167,44 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
       secondary_contact_number: data.secondary_contact_number,
     }
     try {
-      Services.createCustomers(authToken, data)
-        .then(response => {
-          toast({
-            title: "Success! Customer  created successfully.",
-            description: `${response.data.customer_id} Customer created successfully.`,
-            variant: "success",
+      if (!existingCustomer) {
+        Services.createCustomers(authToken, data)
+          .then(response => {
+            toast({
+              title: "Success! Customer  created successfully.",
+              description: `${response.data.customer_id} Customer created successfully.`,
+              variant: "success",
+            })
+            setActive(2)
+            setCustomerUuid(response.data.uuid)
           })
-          setActive(2)
-          setCustomerUuid(response.data.uuid)
-        })
-        .catch(error => {
-          toast({
-            title: "Uh oh! Something went wrong.",
-            description: "There was a problem with your request.",
-            variant: "destructive",
+          .catch(error => {
+            toast({
+              title: "Uh oh! Something went wrong.",
+              description: "There was a problem with your request.",
+              variant: "destructive",
+            })
+            console.error("Error creating customer:", error)
           })
-          console.error("Error creating customer:", error)
-        })
+      } else {
+        Services.editCustomers(authToken, customerUuid, data)
+          .then(response => {
+            toast({
+              title: "Success! Customer created successfully.",
+              description: `${response.data.customer_id} Customer created successfully.`,
+              variant: "success",
+            })
+            setActive(2)
+          })
+          .catch(error => {
+            toast({
+              title: "Uh oh! Something went wrong.",
+              description: "There was a problem with your request.",
+              variant: "destructive",
+            })
+            console.error("Error creating customer:", error)
+          })
+      }
     } catch (error) {
       console.error("Error creating customer:", error)
     }
@@ -172,11 +223,29 @@ const CustomerDetails = ({ setActive, setCustomerUuid, setLocationData }) => {
             <FormItem>
               <FormLabel>Customer Name</FormLabel>
               <FormControl>
-                <Input type="text" {...field} />
+                <Input
+                  type="text"
+                  {...field}
+                  disabled={existingCustomer ? true : false}
+                />
               </FormControl>
             </FormItem>
           )}
         />
+        {existingCustomer && (
+          <FormField
+            control={form.control}
+            name="customer_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Customer ID</FormLabel>
+                <FormControl>
+                  <Input type="text" {...field} disabled />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="house_number"
