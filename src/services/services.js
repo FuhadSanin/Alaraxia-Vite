@@ -118,6 +118,22 @@ class Services {
       },
     })
   }
+
+  visits(authToken, id, data) {
+    return http.patch(`api/v1/tickets/visits/?ticket=${id}/`, data, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
+  closeTicketsByTechnician(authToken, id, data) {
+    return http.patch(`api/v1/tickets/${id}/close_by_technician/`, data, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
   // ---------------User Management----------------
   getUsers(authToken, kind) {
     return http.get(`api/v1/users/?kind=${kind}`, {

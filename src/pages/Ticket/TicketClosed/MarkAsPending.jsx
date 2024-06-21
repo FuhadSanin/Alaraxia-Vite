@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
-} from "@/components/ui/dialog"
+} from "@components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -18,16 +18,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
-import add from "@/assets/Modals/end.png"
-import { Input } from "@/components/ui/input"
+} from "@components/ui/form"
+import { Button } from "@components/ui/button"
+import add from "@assets/Modals/end.png"
 import { Link, useNavigate } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 import { useToast } from "@components/ui/use-toast"
 import { SelectDemo } from "@components/Demo/SelectDemo"
-import { PendingReason } from "@/constants/constants"
+import { PendingReason } from "@constants/constants"
 import { useParams } from "react-router-dom"
 
 // Define the form schema using Zod

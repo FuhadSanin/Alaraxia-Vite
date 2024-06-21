@@ -16,15 +16,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { SelectDemo } from "@/components/Demo/SelectDemo"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@components/ui/form"
+import { SelectDemo } from "@components/Demo/SelectDemo"
+import { Card, CardContent } from "@components/ui/card"
+import { Button } from "@components/ui/button"
+import { Input } from "@components/ui/input"
 import { useParams } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
 // Define the form schema using Zod
 const FormSchema = z.object({

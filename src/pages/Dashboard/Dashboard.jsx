@@ -10,18 +10,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent, CardTitle } from "@/components/ui/card"
+} from "@components/ui/table"
+import { Card, CardContent, CardTitle } from "@components/ui/card"
 import { Smallcards } from "@components/Demo/CardsDashboard"
 import { Smallcolorcards } from "@components/Demo/CardsColorDashboard"
-import { DatePickerDemo } from "@/components/ui/datepicker"
+import { DatePickerDemo } from "@components/ui/datepicker"
 import Tablemob from "@components/Demo/TableMob"
 
 //Card Colors Images
-import green from "@/assets/Cards/green.png"
-import red from "@/assets/Cards/red.png"
-import violet from "@/assets/Cards/violet.png"
-import orange from "@/assets/Cards/orange.png"
+import green from "@assets/Cards/green.png"
+import red from "@assets/Cards/red.png"
+import violet from "@assets/Cards/violet.png"
+import orange from "@assets/Cards/orange.png"
 
 const values = [
   {

@@ -11,8 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form"
-import { SelectDemo } from "@components/Demo/SelectDemo"
+} from "@components/ui/form"
 import { useState, useEffect } from "react"
 import { useAuth } from "@context/AuthContext"
 import { Input } from "@components/ui/input"

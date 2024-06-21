@@ -2,7 +2,7 @@ import React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@components/ui/button"
 import {
   Form,
   FormControl,
@@ -11,13 +11,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@components/ui/form"
+import { Input } from "@components/ui/input"
 import Services from "@services/services"
 import { Link } from "react-router-dom"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@context/AuthContext"
 import { useNavigate } from "react-router-dom"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@components/ui/use-toast"
 
 // Define the form schema using Zod
 

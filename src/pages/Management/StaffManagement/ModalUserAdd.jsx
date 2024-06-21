@@ -18,11 +18,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
+} from "@components/ui/form"
+import { Button } from "@components/ui/button"
 import { Plus } from "lucide-react"
-import add from "@/assets/Modals/addPeople.png"
-import { Input } from "@/components/ui/input"
+import add from "@assets/Modals/addPeople.png"
+import { Input } from "@components/ui/input"
 import { Link, useNavigate } from "react-router-dom"
 
 // Define the form schema using Zod

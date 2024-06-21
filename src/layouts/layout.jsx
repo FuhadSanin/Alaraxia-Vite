@@ -4,8 +4,8 @@ import { cn } from "../lib/utils"
 import { Link, Outlet, useLocation } from "react-router-dom"
 
 //components
-import Sidebar, { SidebarSubItem } from "@/components/Demo/Sidebar"
-import Header from "@/components/Demo/Navbar"
+import Sidebar, { SidebarSubItem } from "@components/Demo/Sidebar"
+import Header from "@components/Demo/Navbar"
 
 //icons
 import { Home, Ticket, Users, ClipboardMinus } from "lucide-react"

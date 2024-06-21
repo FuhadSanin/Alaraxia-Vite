@@ -1,11 +1,11 @@
 // Dashboard.js
 import React from "react"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import WithHappyCode from "@/pages/Ticket/TicketClosed/WithHappyCode"
-import Pending from "@/pages/Ticket/TicketClosed/Pending"
-import WithoutHappyCode from "@/pages/Ticket/TicketClosed/WithoutHappyCode"
+import { Card, CardContent } from "@components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs"
+import WithHappyCode from "@pages/Ticket/TicketClosed/WithHappyCode"
+import Pending from "@pages/Ticket/TicketClosed/Pending"
+import WithoutHappyCode from "@pages/Ticket/TicketClosed/WithoutHappyCode"
 
 const TicketClosed = () => {
   return (

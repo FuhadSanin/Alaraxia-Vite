@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react"
 import { useMediaQuery } from "react-responsive"
 
-import { Skeleton } from "@/components/ui/skeleton"
-import { SelectDemo } from "@/components/Demo/SelectDemo"
-import { Card, CardContent, CardDescription } from "@/components/ui/card"
-import { DatePickerDemo } from "@/components/ui/datepicker"
-import { Button } from "@/components/ui/button"
-import { Command, CommandInput } from "@/components/ui/command"
+import { Skeleton } from "@components/ui/skeleton"
+import { SelectDemo } from "@components/Demo/SelectDemo"
+import { Card, CardContent, CardDescription } from "@components/ui/card"
+import { DatePickerDemo } from "@components/ui/datepicker"
+import { Button } from "@components/ui/button"
+import { Command, CommandInput } from "@components/ui/command"
 import {
   Table,
   TableBody,
   TableCell,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@components/ui/table"
 import {
   Pagination,
   PaginationContent,
@@ -21,19 +21,19 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
-import ModalAddDemo from "@/pages/Ticket/TicketAll/ModalTicketAdd"
+} from "@components/ui/pagination"
+import ModalAddDemo from "@pages/Ticket/TicketAll/ModalTicketAdd"
 import Services from "@services/services"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@context/AuthContext"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@components/ui/dialog"
 
-import { CallType, LocationMap, TicketStatus } from "@/constants/constants"
+import { CallType, LocationMap, TicketStatus } from "@constants/constants"
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
 

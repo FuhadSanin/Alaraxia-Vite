@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -17,11 +17,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
+} from "@components/ui/form"
+import { Button } from "@components/ui/button"
 import { Plus } from "lucide-react"
-import add from "@/assets/Modals/addPeople.png"
-import { Input } from "@/components/ui/input"
+import add from "@assets/Modals/addPeople.png"
+import { Input } from "@components/ui/input"
 import { Link, useNavigate } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"

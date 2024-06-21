@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 //components
-import { Button } from "@/components/ui/button"
+import { Button } from "@components/ui/button"
 import {
   Form,
   FormControl,
@@ -12,8 +12,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@components/ui/form"
+import { Input } from "@components/ui/input"
 
 //services
 import Services from "@services/services"

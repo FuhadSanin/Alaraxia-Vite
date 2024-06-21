@@ -3,15 +3,15 @@ import React, { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@components/ui/button"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@components/ui/form"
+import { Input } from "@components/ui/input"
 
 import { SelectDemo } from "@components/Demo/SelectDemo"
 import Services from "@services/services"

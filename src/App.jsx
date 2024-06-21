@@ -6,8 +6,8 @@ import { Routes, Route, Navigate, Link } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 
 // pages
-import Dashboard from "@/pages/Dashboard/Dashboard"
-import Ticket from "@/pages/Ticket/TicketAll/TicketAll"
+import Dashboard from "@pages/Dashboard/Dashboard"
+import Ticket from "@pages/Ticket/TicketAll/TicketAll"
 import ManagementStaff from "@pages/Management/StaffManagement/ManagementStaff"
 import UIAuth from "@pages/Auth/UIAuth"
 import Reports from "@pages/Report/Reports"

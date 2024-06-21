@@ -1,10 +1,10 @@
 // app/Dashboard/Dashboard.js
 import React, { useEffect, useState } from "react"
-import { SelectDemo } from "@/components/Demo/SelectDemo"
-import { Card, CardContent } from "@/components/ui/card"
-import { DatePickerDemo } from "@/components/ui/datepicker"
-import { Button } from "@/components/ui/button"
-import { Command, CommandInput } from "@/components/ui/command"
+import { SelectDemo } from "@components/Demo/SelectDemo"
+import { Card, CardContent } from "@components/ui/card"
+import { DatePickerDemo } from "@components/ui/datepicker"
+import { Button } from "@components/ui/button"
+import { Command, CommandInput } from "@components/ui/command"
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableHead,
   TableRow,
-} from "@/components/ui/table"
+} from "@components/ui/table"
 import {
   Pagination,
   PaginationContent,
@@ -20,7 +20,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@components/ui/pagination"
 //icons
 import { Plus, Download, Eye, Pencil, EllipsisVertical } from "lucide-react"
 import Services from "@services/services"

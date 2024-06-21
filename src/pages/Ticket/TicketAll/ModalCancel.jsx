@@ -8,16 +8,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form"
-import { SelectDemo } from "@/components/Demo/SelectDemo"
-import { Button } from "@/components/ui/button"
+} from "@components/ui/dialog"
+import { Form, FormField, FormItem, FormLabel } from "@components/ui/form"
+import { SelectDemo } from "@components/Demo/SelectDemo"
+import { Button } from "@components/ui/button"
 import { useParams } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
-import { useToast } from "@/components/ui/use-toast"
-import close from "@/assets/Modals/close.png"
-import { PendingReason } from "@/constants/constants"
+import { useToast } from "@components/ui/use-toast"
+import close from "@assets/Modals/close.png"
+import { PendingReason } from "@constants/constants"
 // Define the form schema using Zod
 const FormSchema = z.object({
   cancellation_reason: z.string().min(1, "Cancel Reason is required"),

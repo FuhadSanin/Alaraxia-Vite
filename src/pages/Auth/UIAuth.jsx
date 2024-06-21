@@ -1,7 +1,7 @@
 import React from "react"
-import logo from "@/assets/logo.svg"
+import logo from "@assets/logo.svg"
 
-import signin from "@/assets/SigninFrame.png"
+import signin from "@assets/SigninFrame.png"
 import {
   Card,
   CardContent,

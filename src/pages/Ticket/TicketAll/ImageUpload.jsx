@@ -1,9 +1,26 @@
 import React, { useState } from "react"
+import { useParams } from "react-router-dom"
+
+import MarkAsPending from "../TicketClosed/MarkAsPending"
+import CloseTicket from "../TicketClosed/CloseTicket"
 
 const FileUploadForm = () => {
-  const [files, setFiles] = useState([])
+  const { id } = useParams()
+
+  // State for files (images) and technician remarks
+  const [formData, setFormData] = useState({
+    files: [],
+    technicianRemarks: "",
+    ticket: id,
+  })
   const [imagePreviews, setImagePreviews] = useState([])
 
+  // Destructuring state variables for easier access
+  const { files, technicianRemarks, ticket } = formData
+
+  console.log(formData)
+
+  // Function to handle file selection
   const handleFileSelect = async event => {
     event.preventDefault()
     const selectedFiles = Array.from(
@@ -68,28 +85,37 @@ const FileUploadForm = () => {
         continue
       }
 
-      // Compress image and set state
+      // Compress image and update state
       const compressedBlob = await compressImage(selectedFile)
       newFiles.push(new File([compressedBlob], selectedFile.name))
       newPreviews.push(URL.createObjectURL(compressedBlob))
     }
 
-    setFiles(prev => [...prev, ...newFiles].slice(0, 3))
+    // Update state with new files and previews
+    setFormData(prev => ({
+      ...prev,
+      files: [...prev.files, ...newFiles].slice(0, 3),
+    }))
+
     setImagePreviews(prev => [...prev, ...newPreviews])
   }
 
-  console.log(files)
-
+  // Function to handle drag over event
   const handleDragOver = event => {
     event.preventDefault()
   }
 
+  // Function to handle drop event
   const handleDrop = event => {
     handleFileSelect(event)
   }
 
+  // Function to remove image by index
   const handleRemoveImage = index => {
-    setFiles(files.filter((_, i) => i !== index))
+    setFormData(prev => ({
+      ...prev,
+      files: prev.files.filter((_, i) => i !== index),
+    }))
     setImagePreviews(imagePreviews.filter((_, i) => i !== index))
   }
 
@@ -159,6 +185,21 @@ const FileUploadForm = () => {
         </label>
       </form>
       <h1 className="text-xl font-medium mb-3 mt-3">Technician Remarks</h1>
+      <textarea
+        className="w-full h-32 p-3 border dark:bg-[#181818]  rounded-xl"
+        placeholder="Enter your remarks here"
+        value={technicianRemarks}
+        onChange={e =>
+          setFormData(prev => ({
+            ...prev,
+            technicianRemarks: e.target.value,
+          }))
+        }
+      ></textarea>
+      <div className="mt-5 flex justify-between">
+        {/* Pass files and technicianRemarks as props to CloseTicket */}
+        <CloseTicket formData={formData} />
+      </div>
     </>
   )
 }

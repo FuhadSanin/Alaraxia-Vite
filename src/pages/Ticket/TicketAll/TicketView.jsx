@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@components/ui/card"
 import { CardDescription, CardTitle } from "@components/ui/card"
 import {
   Table,
@@ -7,8 +7,8 @@ import {
   TableCell,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+} from "@components/ui/table"
+import { Button } from "@components/ui/button"
 import ModalAssign from "./ModalAssign"
 import { Link, useParams } from "react-router-dom"
 import Services from "@services/services"
@@ -19,9 +19,9 @@ import {
   LocationMap,
   ServiceType,
   CustomerDemand,
-} from "@/constants/constants"
+} from "@constants/constants"
 import { ChevronsLeft } from "lucide-react"
-import { PendingReason } from "@/constants/constants"
+import { PendingReason } from "@constants/constants"
 import ModalCancel from "./ModalCancel"
 import MarkAsPending from "../TicketClosed/MarkAsPending"
 import CloseTicket from "../TicketClosed/CloseTicket"
@@ -139,10 +139,13 @@ const TicketView = () => {
               </ul>
             </div>
           </div>
-          <div className="w-full md:w-auto mt-4 md:mt-0">
-            <div className="flex justify-end ">
-              {(kind !== 1 || ticket.ticket_status !== 3) &&
-                (ticket.ticket_status === 5 ? (
+          {kind !== 1 ||
+          ticket.ticket_status !== 4 ||
+          ticket.ticket_status !== 3 ||
+          ticket.ticket_status !== 6 ? (
+            <div className="w-full md:w-auto mt-4 md:mt-0">
+              <div className="flex justify-end">
+                {ticket.ticket_status === 5 ? (
                   <div className="flex gap-5">
                     <div>
                       <ModalAssign title="Reassign" id={ticket.uuid} />
@@ -160,9 +163,10 @@ const TicketView = () => {
                     </p>
                     <p className="font-semibold">{technician}</p>
                   </div>
-                ))}
+                )}
+              </div>
             </div>
-          </div>
+          ) : null}
         </CardContent>
       </Card>
       {/* Customer Details */}
@@ -324,13 +328,7 @@ const TicketView = () => {
       </div>
       {/* Action Section */}
       {kind === 1 ? (
-        <>
-          <ImageUpload />
-          <div className="flex justify-between mt-5">
-            <MarkAsPending />
-            <CloseTicket />
-          </div>
-        </>
+        <ImageUpload />
       ) : (
         <Card className="mb-5">
           <CardTitle> Service History</CardTitle>

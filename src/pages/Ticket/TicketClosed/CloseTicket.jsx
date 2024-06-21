@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
-} from "@/components/ui/dialog"
+} from "@components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -18,23 +18,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
-import add from "@/assets/Modals/end.png"
-import { Input } from "@/components/ui/input"
+} from "@components/ui/form"
+import { Button } from "@components/ui/button"
+import add from "@assets/Modals/end.png"
+import { Input } from "@components/ui/input"
 import { Link, useNavigate } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 import { useToast } from "@components/ui/use-toast"
-import { SelectDemo } from "@components/Demo/SelectDemo"
-import { PendingReason } from "@/constants/constants"
+import { useParams } from "react-router-dom"
 
 // Define the form schema using Zod
 const FormSchema = z.object({
-  pending_reason: z.string().min(1, "Pending Reason is required"),
+  happy_code: z.string().min(1),
 })
 
 const TicketAddForm = () => {
+  const { id } = useParams()
   const navigate = useNavigate()
   const { toast } = useToast()
   const { authToken } = useAuth()
@@ -44,32 +44,36 @@ const TicketAddForm = () => {
       happy_code: "",
     },
   })
-  const fetchData = async (id, name) => {
-    if (authToken) {
-      try {
-        const response = await Services.getCustomersByCustomerIdAndName(
-          authToken,
-          id,
-          name
-        )
-        if (response.data.count === 1) {
-          navigate(`/ticket/add`)
-        } else {
+  const fetchData = async happy_code => {
+    try {
+      const data = {
+        with_happy_code: true,
+        happy_code: happy_code,
+      }
+      Services.closeTicketsByTechnician(authToken, id, data)
+        .then(response => {
           toast({
-            title: "Customer not found",
-            description: "Please check the customer ID and name",
+            title: "Ticket Closed",
+            description: "The ticket has been closed",
+            variant: "success",
+          })
+          navigate("/ticket/closed")
+        })
+        .catch(error => {
+          toast({
+            title: "Incorrect Happy Code",
+            description: "Please enter the correct Happy Code",
             variant: "destructive",
           })
-        }
-      } catch (error) {
-        console.error("Error fetching tickets:", error)
-      }
+        })
+    } catch (error) {
+      console.error("Error closing ticket:", error)
     }
   }
 
   const onSubmit = data => {
     try {
-      fetchData(data.id, data.name)
+      fetchData(data.happy_code)
     } catch (error) {
       console.error("Error fetching tickets:", error)
     }
@@ -83,7 +87,7 @@ const TicketAddForm = () => {
       >
         <FormField
           control={form.control}
-          name="pending_reason"
+          name="happy_code"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Enter Happy Code</FormLabel>
@@ -99,12 +103,59 @@ const TicketAddForm = () => {
   )
 }
 
-const CloseTicket = () => {
+const CloseTicket = ({ formData }) => {
+  const { authToken } = useAuth()
+  const { toast } = useToast()
+  const navigate = useNavigate()
+  const { id } = useParams()
   const [ticketType, setTicketType] = useState("with")
 
   const handleTicketTypeChange = event => {
     setTicketType(event.target.value)
   }
+
+  const handleClose = () => {
+    if (ticketType === "without") {
+      try {
+        const data = {
+          with_happy_code: false,
+        }
+        Services.closeTicketsByTechnician(authToken, id, data)
+          .then(response => {
+            toast({
+              title: "Ticket Closed",
+              description: "The ticket has been closed",
+              variant: "success",
+            })
+            navigate("/ticket/closed")
+          })
+          .catch(error => {
+            console.error("Error closing ticket:", error)
+          })
+      } catch (error) {
+        console.error("Error closing ticket:", error)
+      }
+    }
+    if (formData) {
+      try {
+        Services.visits(authToken, id, formData)
+          .then(response => {
+            toast({
+              title: "Ticket Closed",
+              description: "The ticket has been closed",
+              variant: "success",
+            })
+            navigate("/ticket/closed")
+          })
+          .catch(error => {
+            console.error("Error closing ticket:", error)
+          })
+      } catch (error) {
+        console.error("Error closing ticket:", error)
+      }
+    }
+  }
+
   return (
     <>
       <Dialog>
@@ -163,7 +214,12 @@ const CloseTicket = () => {
           {ticketType === "with" ? (
             <TicketAddForm />
           ) : (
-            <Button className="w-full" type="submit" variant="blue">
+            <Button
+              className="w-full"
+              type="submit"
+              variant="blue"
+              onClick={handleClose}
+            >
               Close Ticket
             </Button>
           )}
