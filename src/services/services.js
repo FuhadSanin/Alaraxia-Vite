@@ -68,13 +68,30 @@ class Services {
     })
   }
 
-  getTickets(authToken) {
-    return http.get("api/v1/tickets", {
+  searchTickets(authToken, data) {
+    return http.get(`api/v1/tickets/?search=${data}`, {
       headers: {
         Authorization: `${authToken.token}`,
       },
     })
   }
+
+  getTickets(authToken, limit, offset) {
+    return http.get(`api/v1/tickets/?limit=${limit}&offset=${offset}`, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
+  pageTickets(authToken, url) {
+    return http.get(url, {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
   createTickets(authToken, data) {
     return http.post("api/v1/tickets/", data, {
       headers: {

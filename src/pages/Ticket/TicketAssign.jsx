@@ -172,6 +172,7 @@ const TicketAssign = () => {
                     <TableCell>Created On</TableCell>
                     <TableCell>Assigned On</TableCell>
                     <TableCell>Location</TableCell>
+                    <TableCell>Technician</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
@@ -215,8 +216,11 @@ const TicketAssign = () => {
                         <TableCell>{ticket.product_name}</TableCell>
                         <TableCell>{CallType[ticket.call_type]}</TableCell>
                         <TableCell>{ticket.created_at.slice(0, 10)}</TableCell>
-                        <TableCell>{ticket.assigned_at}</TableCell>
+                        <TableCell>
+                          {ticket?.assigned_on.slice(0, 10)}
+                        </TableCell>
                         <TableCell>{LocationMap[ticket.location]}</TableCell>
+                        <TableCell>{ticket.assigned_technician_name}</TableCell>
                         <TableCell>
                           <ModalAssign id={ticket.uuid} title="Reassign" />
                         </TableCell>

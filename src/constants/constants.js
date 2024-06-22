@@ -34,6 +34,20 @@ const PendingReason = [
   { value: "11", label: "Product sent to Company for testing" },
 ]
 
+const PendingReasonMap = {
+  1: "Part Not Available",
+  2: "Awaiting customer approval",
+  3: "No Responsible person",
+  4: "Purchase proof awaited",
+  5: "Replacement approval awaited",
+  6: "To be collected to Workshop",
+  7: "Customer Reappointment",
+  8: "Ready for delivery. Waiting for customer to pick up",
+  9: "Customer refused for repairs",
+  10: "Customer refused to give appointment",
+  11: "Product sent to Company for testing",
+}
+
 const CancellationReason = [
   { value: "1", label: "Customer refused repairs" },
   { value: "2", label: "High repair charges" },
@@ -66,6 +80,7 @@ export {
   TicketStatus,
   CustomerDemand,
   PendingReason,
+  PendingReasonMap,
   CancellationReason,
   LocationMap,
 }

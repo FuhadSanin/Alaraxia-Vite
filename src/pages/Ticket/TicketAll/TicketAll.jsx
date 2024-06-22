@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react"
 import { useMediaQuery } from "react-responsive"
-
 import { Skeleton } from "@components/ui/skeleton"
 import { SelectDemo } from "@components/Demo/SelectDemo"
 import { Card, CardContent, CardDescription } from "@components/ui/card"
 import { DatePickerDemo } from "@components/ui/datepicker"
 import { Button } from "@components/ui/button"
-import { Command, CommandInput } from "@components/ui/command"
 import {
   Table,
   TableBody,
@@ -32,10 +30,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@components/ui/dialog"
-
 import { CallType, LocationMap, TicketStatus } from "@constants/constants"
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
+import { Input } from "@components/ui/input"
 
 const Ticket = () => {
   const { authToken } = useAuth()
@@ -43,44 +41,83 @@ const Ticket = () => {
 
   const [isLoading, setIsLoading] = useState(true)
   const [tickets, setTickets] = useState([])
+  const [searchInput, setSearchInput] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [next, setNext] = useState(null)
+  const [previous, setPrevious] = useState(null)
+
+  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [totalCount, setTotalCount] = useState(0)
+  const [offset, setOffset] = useState(0)
+
+  const totalPages = Math.ceil(totalCount / itemsPerPage)
+  console.log("Total Pages:", totalPages)
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (authToken) {
-        try {
-          const response = await Services.getTickets(authToken)
-          setTickets(response.data.results)
-          setTimeout(() => {
-            setIsLoading(false)
-          }, 1000)
-          console.log("Tickets fetched successfully:", response.data.results)
-        } catch (error) {
-          console.error("Error fetching tickets:", error)
+    fetchData()
+  }, [authToken, currentPage, itemsPerPage])
+
+  const fetchData = async () => {
+    if (authToken) {
+      setIsLoading(true)
+      try {
+        const response = await Services.getTickets(
+          authToken,
+          itemsPerPage,
+          offset
+        )
+        setTickets(response.data.results)
+        setTotalCount(response.data.count)
+        setNext(response.data.next)
+        setPrevious(response.data.previous)
+        setTimeout(() => {
           setIsLoading(false)
-        }
+        }, 1000)
+        console.log("Tickets fetched successfully:", response.data.results)
+      } catch (error) {
+        console.error("Error fetching tickets:", error)
+        setIsLoading(false)
       }
     }
+  }
 
-    fetchData()
-  }, [authToken])
+  const fetchPage = async page => {
+    if (authToken) {
+      try {
+        const response = await Services.pageTickets(authToken, page)
+        setTickets(response.data.results)
+        setTotalCount(response.data.count)
+        setNext(response.data.next)
+        setPrevious(response.data.previous)
+        console.log("Tickets fetched successfully:", response.data.results)
+      } catch (error) {
+        console.error("Error fetching tickets:", error)
+      }
+    }
+  }
 
-  const itemsPerPage = 3
-  const totalPages = Math.ceil(tickets.length / itemsPerPage)
-  const indexOfLastTicket = currentPage * itemsPerPage
-  const indexOfFirstTicket = indexOfLastTicket - itemsPerPage
-  const currentTickets = Array.isArray(tickets)
-    ? tickets.slice(indexOfFirstTicket, indexOfLastTicket)
-    : []
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
+  const handleNextPage = async () => {
+    if (next !== null) {
+      await fetchPage(next)
+      if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1)
+      }
+    }
   }
 
   const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
+    if (previous !== null) {
+      fetchPage(previous)
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1)
+      }
+    }
   }
 
+  const handleSearchInputChange = e => {
+    const value = e.target.value
+    setSearchInput(value)
+  }
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
@@ -90,9 +127,11 @@ const Ticket = () => {
         <CardContent className="p-0">
           <div className="flex flex-wrap justify-between items-center mb-8">
             <div className="w-fit">
-              <Command className="rounded-full border ">
-                <CommandInput placeholder="Search Customers" />
-              </Command>
+              <Input
+                placeholder="Search Customer "
+                value={searchInput}
+                onChange={handleSearchInputChange}
+              />
             </div>
             {!isMobile ? (
               <div className="flex gap-5 items-center justify-center">
@@ -183,7 +222,7 @@ const Ticket = () => {
                           ))}
                         </TableRow>
                       ))
-                    : currentTickets.map((ticket, index) => (
+                    : tickets.map((ticket, index) => (
                         <TableRow key={index}>
                           <TableCell>{ticket.ticket_id}</TableCell>
                           <TableCell className="flex flex-col">
@@ -212,7 +251,7 @@ const Ticket = () => {
               </Table>
             ) : (
               <div className="w-full flex flex-col gap-5">
-                {tickets.map((ticket, index) => (
+                {currentTickets.map((ticket, index) => (
                   <Card className="bg-white p-0" key={index}>
                     <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
                       <h4>{ticket.ticket_id}</h4>
@@ -238,13 +277,13 @@ const Ticket = () => {
                           <tr>
                             <CardDescription>CallType</CardDescription>
                             <td className="text-right">
-                              {ticket.call_type || "N/A"}
+                              {CallType[ticket.call_type] || "N/A"}
                             </td>
                           </tr>
                           <tr>
                             <CardDescription>Location</CardDescription>
                             <td className="text-right">
-                              {ticket.location || "N/A"}
+                              {LocationMap[ticket.location] || "N/A"}
                             </td>
                           </tr>
                           <tr>
@@ -263,18 +302,21 @@ const Ticket = () => {
           </div>
           <div className="flex flex-wrap items-center justify-between">
             <div>
-              <SelectDemo label="10" />
+              <SelectDemo
+                options={[
+                  { value: 5, label: 5 },
+                  { value: 10, label: 10 },
+                  { value: 50, label: 50 },
+                ]}
+                value={itemsPerPage}
+                onChange={value => setItemsPerPage(value)}
+              />
             </div>
             <div>
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious
-                      onClick={handlePreviousPage}
-                      className={`${
-                        currentPage === 1 ? " cursor-not-allowed" : ""
-                      }`}
-                    />
+                    <PaginationPrevious onClick={handlePreviousPage} />
                   </PaginationItem>
                   {totalPages &&
                     [...Array(totalPages).keys()].map(number => (
@@ -282,19 +324,13 @@ const Ticket = () => {
                         <PaginationLink
                           href="#"
                           isActive={number + 1 === currentPage}
-                          onClick={() => setCurrentPage(number + 1)}
                         >
                           {number + 1}
                         </PaginationLink>
                       </PaginationItem>
                     ))}
                   <PaginationItem>
-                    <PaginationNext
-                      className={`${
-                        currentPage === totalPages ? " cursor-not-allowed" : ""
-                      }`}
-                      onClick={handleNextPage}
-                    />
+                    <PaginationNext onClick={handleNextPage} />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
