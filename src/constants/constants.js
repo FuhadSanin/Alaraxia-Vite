@@ -48,6 +48,14 @@ const PendingReasonMap = {
   11: "Product sent to Company for testing",
 }
 
+const CancellationReasonMap = {
+  1: "Customer refused repairs",
+  2: "High repair charges",
+  3: "No issues found",
+  4: "Appointment cancelled",
+  5: "Customer not available",
+}
+
 const CancellationReason = [
   { value: "1", label: "Customer refused repairs" },
   { value: "2", label: "High repair charges" },
@@ -83,4 +91,5 @@ export {
   PendingReasonMap,
   CancellationReason,
   LocationMap,
+  CancellationReasonMap,
 }

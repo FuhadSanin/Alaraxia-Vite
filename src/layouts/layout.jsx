@@ -4,11 +4,10 @@ import { cn } from "../lib/utils"
 import { Link, Outlet, useLocation } from "react-router-dom"
 
 //components
-import Sidebar, { SidebarSubItem } from "@components/Demo/Sidebar"
 import Header from "@components/Demo/Navbar"
 
 //icons
-import { Home, Ticket, Users, ClipboardMinus } from "lucide-react"
+import SidebarDemo from "@components/Demo/Sidebar"
 import Navbarmob from "@components/Demo/NavbarMob"
 
 // Create context
@@ -75,94 +74,7 @@ export default function Layout() {
           setActiveSubmenu,
         }}
       >
-        {!isMobile && (
-          <Sidebar>
-            <SidebarSubItem
-              icon={<Home size={20} />}
-              text="Dashboard"
-              active={active === "Dashboard"}
-              onClick={() => setActive("Dashboard")}
-              as={Link}
-              to="/"
-            />
-            <SidebarSubItem
-              icon={<Ticket size={20} />}
-              text="Tickets"
-              active={active === "Tickets"}
-              onClick={() => setActive("Tickets")}
-              as={Link}
-              to="/ticket"
-              submenus={[
-                {
-                  text: "All Tickets",
-                  to: "/ticket",
-                  active: activeSubmenu === "All Tickets",
-                  onClick: () => setActiveSubmenu("All Tickets"),
-                },
-                {
-                  text: "Open Ticket",
-                  to: "/ticket/open",
-                  active: activeSubmenu === "Open Ticket",
-                  onClick: () => setActiveSubmenu("Open Ticket"),
-                },
-                {
-                  text: "Assigned Ticket",
-                  to: "/ticket/assigned",
-                  active: activeSubmenu === "Assigned Ticket",
-                  onClick: () => setActiveSubmenu("Assigned Ticket"),
-                },
-                {
-                  text: "Pending Ticket",
-                  to: "/ticket/pending",
-                  active: activeSubmenu === "Pending Ticket",
-                  onClick: () => setActiveSubmenu("Pending Ticket"),
-                },
-                {
-                  text: "Cancelled Ticket",
-                  to: "/ticket/cancelled",
-                  active: activeSubmenu === "Cancelled Ticket",
-                  onClick: () => setActiveSubmenu("Cancelled Ticket"),
-                },
-                {
-                  text: "Closed Ticket",
-                  to: "/ticket/closed",
-                  active: activeSubmenu === "Closed Ticket",
-                  onClick: () => setActiveSubmenu("Closed Ticket"),
-                },
-              ]}
-            />
-            <SidebarSubItem
-              icon={<Users size={20} />}
-              text="User Management"
-              active={active === "User Management"}
-              onClick={() => setActive("User Management")}
-              as={Link}
-              to="/management/staff"
-              submenus={[
-                {
-                  text: "Staff Management",
-                  to: "/management/staff",
-                  active: activeSubmenu === "Staff Management",
-                  onClick: () => setActiveSubmenu("Staff Management"),
-                },
-                {
-                  text: "Customer Management",
-                  to: "/management/customer",
-                  active: activeSubmenu === "Customer Management",
-                  onClick: () => setActiveSubmenu("Customer Management"),
-                },
-              ]}
-            />
-            <SidebarSubItem
-              icon={<ClipboardMinus size={20} />}
-              text="Reports"
-              active={active === "Reports"}
-              onClick={() => setActive("Reports")}
-              as={Link}
-              to="/reports"
-            />
-          </Sidebar>
-        )}
+        {!isMobile && <SidebarDemo />}
         <div className={`w-full h-screen ${!isMobile ? "p-7" : "p-2"}`}>
           <div>
             {!isMobile ? (

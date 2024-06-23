@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -14,13 +14,11 @@ import {
 } from "@components/ui/form"
 import { Input } from "@components/ui/input"
 import Services from "@services/services"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
-import { useNavigate } from "react-router-dom"
 import { useToast } from "@components/ui/use-toast"
 
 // Define the form schema using Zod
-
 const FormSchema = z.object({
   email: z.string().email(),
   password: z.string().min(2),
@@ -28,7 +26,7 @@ const FormSchema = z.object({
 
 export function SignIn() {
   const { toast } = useToast()
-  const { setAuthToken } = useAuth()
+  const { setAuthToken, authToken, setUserProfile } = useAuth()
   const navigate = useNavigate()
 
   const form = useForm({
@@ -44,10 +42,9 @@ export function SignIn() {
       Services.signIn(data)
         .then(response => {
           setAuthToken(response.data) // Store token in context
-          console.log("Signed in successfully. Token:", response.data.token)
           toast({
             title: "Success! You are now signed in.",
-            description: `${response.data.token}`,
+            description: "You have successfully signed in.",
             variant: "success",
           })
           navigate("/")
@@ -55,13 +52,25 @@ export function SignIn() {
         .catch(error => {
           toast({
             title: "Uh oh! Something went wrong.",
-            description: `${error}`,
+            description: `${error.message}`,
             variant: "destructive",
           })
           console.error("Error signing in:", error)
         })
     }
   }
+
+  useEffect(() => {
+    if (authToken) {
+      try {
+        Services.getProfile(authToken).then(response => {
+          setUserProfile(response.data)
+        })
+      } catch (error) {
+        console.error("Error getting profile:", error)
+      }
+    }
+  }, [authToken])
 
   return (
     <Form {...form}>

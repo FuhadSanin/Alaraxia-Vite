@@ -6,6 +6,14 @@ class Services {
     return http.post("auth/login", data, config)
   }
 
+  getProfile(authToken) {
+    return http.get("api/v1/me", {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
   getLocations(authToken) {
     return http.get("api/v1/locations", {
       headers: {
@@ -68,26 +76,28 @@ class Services {
     })
   }
 
-  searchTickets(authToken, data) {
-    return http.get(`api/v1/tickets/?search=${data}`, {
+  getTicketsByLocations(authToken, location) {
+    return http.get(`api/v1/tickets/?location=${location}`, {
       headers: {
         Authorization: `${authToken.token}`,
       },
     })
   }
 
-  getTickets(authToken, limit, offset) {
-    return http.get(`api/v1/tickets/?limit=${limit}&offset=${offset}`, {
+  getTickets(authToken, data) {
+    return http.get(`api/v1/tickets/`, {
       headers: {
         Authorization: `${authToken.token}`,
       },
-    })
-  }
-
-  pageTickets(authToken, url) {
-    return http.get(url, {
-      headers: {
-        Authorization: `${authToken.token}`,
+      params: {
+        customer_id: data.customer_id,
+        search: data.search,
+        location: data.location,
+        limit: data.limit,
+        created_at_before: data.created_at_before,
+        created_at_after: data.created_at_after,
+        ticket_status: data.ticket_status,
+        with_happy_code: data.with_happy_code,
       },
     })
   }
@@ -144,8 +154,8 @@ class Services {
     })
   }
 
-  closeTicketsByTechnician(authToken, id, data) {
-    return http.patch(`api/v1/tickets/${id}/close_by_technician/`, data, {
+  closeTickets(authToken, id, data, user) {
+    return http.patch(`api/v1/tickets/${id}/${user}/`, data, {
       headers: {
         Authorization: `${authToken.token}`,
       },

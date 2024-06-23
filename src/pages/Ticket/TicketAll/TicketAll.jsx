@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Skeleton } from "@components/ui/skeleton"
 import { SelectDemo } from "@components/Demo/SelectDemo"
@@ -34,90 +34,238 @@ import { CallType, LocationMap, TicketStatus } from "@constants/constants"
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Input } from "@components/ui/input"
+import { useQuery } from "@tanstack/react-query"
+import { data } from "autoprefixer"
+
+const useTicketsQuery = (
+  authToken,
+  itemsPerPage,
+  searchInput,
+  selectedLocation,
+  selectedFromDate,
+  selectedToDate
+) => {
+  return useQuery({
+    queryKey: [
+      "tickets",
+      authToken,
+      itemsPerPage,
+      searchInput,
+      selectedLocation,
+      selectedFromDate,
+      selectedToDate,
+    ],
+    queryFn: async () => {
+      try {
+        let response
+        const data = {
+          limit: itemsPerPage,
+          search: searchInput,
+          location: selectedLocation,
+          created_at_after: selectedFromDate,
+          created_at_before: selectedToDate,
+        }
+        response = await Services.getTickets(authToken, data)
+
+        return response.data.results
+      } catch (error) {
+        throw new Error(`Failed to fetch tickets: ${error.message}`)
+      }
+    },
+  })
+}
+
+const SkeletonRows = ({ rows, columns }) => (
+  <div>
+    {[...Array(rows)].map((_, rowIndex) => (
+      <div key={rowIndex} className="flex p-4 justify-between">
+        {[...Array(columns)].map((_, colIndex) => (
+          <Skeleton key={colIndex} className="h-4 w-32" />
+        ))}
+      </div>
+    ))}
+  </div>
+)
+
+const TicketTable = ({ tickets }) => (
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableCell>Ticket ID</TableCell>
+        <TableCell>Customer Name</TableCell>
+        <TableCell>Product Type</TableCell>
+        <TableCell>Call Type</TableCell>
+        <TableCell>Created On</TableCell>
+        <TableCell>Location</TableCell>
+        <TableCell>Status</TableCell>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {tickets.map((ticket, index) => (
+        <TableRow key={index}>
+          <TableCell>{ticket.ticket_id}</TableCell>
+          <TableCell className="flex flex-col">
+            {ticket.customer_name}
+            <span className="text-[13px] text-gray-500">
+              {ticket.customer_id}
+            </span>
+          </TableCell>
+          <TableCell>{ticket.product_name}</TableCell>
+          <TableCell>{CallType[ticket.call_type]}</TableCell>
+          <TableCell>{ticket.created_at.slice(0, 10)}</TableCell>
+          <TableCell>{LocationMap[ticket.location]}</TableCell>
+          <TableCell>
+            <Button
+              className="h-7"
+              variant={TicketStatus[ticket.ticket_status]}
+            >
+              {TicketStatus[ticket.ticket_status]}
+            </Button>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+)
+
+const TicketMobileView = ({ tickets }) => (
+  <div className="w-full flex flex-col gap-5">
+    {tickets.map((ticket, index) => (
+      <Card className="bg-white p-0" key={index}>
+        <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
+          <h4>{ticket.ticket_id}</h4>
+          <Link className="bg-white rounded-full text-gray-500 p-1">
+            <ChevronRight size={20} />
+          </Link>
+        </div>
+        <CardContent>
+          <table className="w-full">
+            <tbody>
+              <tr>
+                <CardDescription>Name</CardDescription>
+                <td className="text-right">{ticket.customer_name || "N/A"}</td>
+              </tr>
+              <tr>
+                <CardDescription>Product Type</CardDescription>
+                <td className="text-right">{ticket.product_name || "N/A"}</td>
+              </tr>
+              <tr>
+                <CardDescription>CallType</CardDescription>
+                <td className="text-right">
+                  {CallType[ticket.call_type] || "N/A"}
+                </td>
+              </tr>
+              <tr>
+                <CardDescription>Location</CardDescription>
+                <td className="text-right">
+                  {LocationMap[ticket.location] || "N/A"}
+                </td>
+              </tr>
+              <tr>
+                <CardDescription>Landmark</CardDescription>
+                <td className="text-right">{ticket.landmark || "N/A"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+)
 
 const Ticket = () => {
   const { authToken } = useAuth()
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  const [isLoading, setIsLoading] = useState(true)
-  const [tickets, setTickets] = useState([])
-  const [searchInput, setSearchInput] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [next, setNext] = useState(null)
-  const [previous, setPrevious] = useState(null)
+  const [state, setState] = useState({
+    searchInput: "",
+    selectedLocation: undefined,
+    selectedFromDate: null,
+    selectedToDate: null,
+    itemsPerPage: 5,
+  })
 
-  const [itemsPerPage, setItemsPerPage] = useState(5)
-  const [totalCount, setTotalCount] = useState(0)
-  const [offset, setOffset] = useState(0)
+  const {
+    searchInput,
+    selectedLocation,
+    selectedFromDate,
+    selectedToDate,
+    itemsPerPage,
+  } = state
 
-  const totalPages = Math.ceil(totalCount / itemsPerPage)
-  console.log("Total Pages:", totalPages)
+  const {
+    isLoading,
+    isError,
+    error,
+    data: tickets,
+  } = useTicketsQuery(
+    authToken,
+    itemsPerPage,
+    searchInput,
+    selectedLocation,
+    selectedFromDate,
+    selectedToDate
+  )
+
+  const { data: locations } = useQuery({
+    queryKey: ["locations", authToken],
+    queryFn: async () => {
+      const response = await Services.getLocations(authToken)
+      const mappedLocations = response.data.results.map(location => ({
+        value: location.uuid,
+        label: location.name,
+      }))
+      return mappedLocations
+    },
+  })
 
   useEffect(() => {
-    fetchData()
-  }, [authToken, currentPage, itemsPerPage])
+    const handler = setTimeout(() => {
+      setState(prevState => ({
+        ...prevState,
+        debouncedSearchInput: searchInput,
+      }))
+    }, 500)
 
-  const fetchData = async () => {
-    if (authToken) {
-      setIsLoading(true)
-      try {
-        const response = await Services.getTickets(
-          authToken,
-          itemsPerPage,
-          offset
-        )
-        setTickets(response.data.results)
-        setTotalCount(response.data.count)
-        setNext(response.data.next)
-        setPrevious(response.data.previous)
-        setTimeout(() => {
-          setIsLoading(false)
-        }, 1000)
-        console.log("Tickets fetched successfully:", response.data.results)
-      } catch (error) {
-        console.error("Error fetching tickets:", error)
-        setIsLoading(false)
-      }
+    return () => {
+      clearTimeout(handler)
     }
-  }
-
-  const fetchPage = async page => {
-    if (authToken) {
-      try {
-        const response = await Services.pageTickets(authToken, page)
-        setTickets(response.data.results)
-        setTotalCount(response.data.count)
-        setNext(response.data.next)
-        setPrevious(response.data.previous)
-        console.log("Tickets fetched successfully:", response.data.results)
-      } catch (error) {
-        console.error("Error fetching tickets:", error)
-      }
-    }
-  }
-
-  const handleNextPage = async () => {
-    if (next !== null) {
-      await fetchPage(next)
-      if (currentPage < totalPages) {
-        setCurrentPage(currentPage + 1)
-      }
-    }
-  }
-
-  const handlePreviousPage = () => {
-    if (previous !== null) {
-      fetchPage(previous)
-      if (currentPage > 1) {
-        setCurrentPage(currentPage - 1)
-      }
-    }
-  }
+  }, [searchInput])
 
   const handleSearchInputChange = e => {
-    const value = e.target.value
-    setSearchInput(value)
+    const { value } = e.target
+    setState(prevState => ({
+      ...prevState,
+      searchInput: value,
+    }))
   }
+
+  const handleFromDate = date => {
+    setState(prevState => ({
+      ...prevState,
+      selectedFromDate: JSON.stringify(date).slice(1, 11),
+    }))
+  }
+
+  const handleToDate = date => {
+    setState(prevState => ({
+      ...prevState,
+      selectedToDate: JSON.stringify(date).slice(1, 11),
+    }))
+  }
+
+  if (isError) {
+    return (
+      <div className="container mx-auto p-4">
+        <p>
+          Something went wrong. Please try again later.
+          <br />
+          Error: {error.message}
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
@@ -128,7 +276,7 @@ const Ticket = () => {
           <div className="flex flex-wrap justify-between items-center mb-8">
             <div className="w-fit">
               <Input
-                placeholder="Search Customer "
+                placeholder="Search Customer"
                 value={searchInput}
                 onChange={handleSearchInputChange}
               />
@@ -136,24 +284,37 @@ const Ticket = () => {
             {!isMobile ? (
               <div className="flex gap-5 items-center justify-center">
                 <div className="flex">
-                  <SelectDemo label="Location" />
+                  <SelectDemo
+                    label="Location"
+                    options={locations}
+                    value={selectedLocation}
+                    onChange={value =>
+                      setState(prevState => ({
+                        ...prevState,
+                        selectedLocation: value,
+                      }))
+                    }
+                  />
                 </div>
                 <div className="flex items-center gap-2">
-                  <DatePickerDemo placeholder="From Date" />
+                  <DatePickerDemo
+                    placeholder="From Date"
+                    onSelectDate={handleFromDate}
+                  />
+
                   <span className="text-gray-600">To</span>
-                  <DatePickerDemo placeholder="To Date" />
+                  <DatePickerDemo
+                    placeholder="To Date"
+                    onSelectDate={handleToDate}
+                  />
                 </div>
-                <div>
-                  <ModalAddDemo />
-                </div>
-                <div>
-                  <Button variant="secondary">
-                    Export
-                    <span className="ml-2">
-                      <Download strokeWidth={1.2} />
-                    </span>
-                  </Button>
-                </div>
+                <ModalAddDemo />
+                <Button variant="secondary">
+                  Export
+                  <span className="ml-2">
+                    <Download strokeWidth={1.2} />
+                  </span>
+                </Button>
               </div>
             ) : (
               <div className="flex flex-wrap items-center justify-between">
@@ -193,113 +354,22 @@ const Ticket = () => {
               </div>
             )}
           </div>
-          <div className="mb-8">
-            {tickets.length === 0 ? (
-              <div className="flex justify-center items-center h-40">
-                <p className="text-gray-500">No tickets found</p>
-              </div>
-            ) : !isMobile ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableCell>Ticket ID</TableCell>
-                    <TableCell>Customer Name</TableCell>
-                    <TableCell>Product Type</TableCell>
-                    <TableCell>Call Type</TableCell>
-                    <TableCell>Created On</TableCell>
-                    <TableCell>Location</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading
-                    ? Array.from({ length: 3 }).map((_, index) => (
-                        <TableRow key={index}>
-                          {Array.from({ length: 7 }).map((_, cellIndex) => (
-                            <TableCell className="pt-5 pb-5" key={cellIndex}>
-                              <Skeleton className="w-[100px] h-[20px] rounded-full" />
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))
-                    : tickets.map((ticket, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{ticket.ticket_id}</TableCell>
-                          <TableCell className="flex flex-col">
-                            {ticket.customer_name}{" "}
-                            <span className="text-[13px] text-gray-500">
-                              {ticket.customer_id}
-                            </span>
-                          </TableCell>
-                          <TableCell>{ticket.product_name}</TableCell>
-                          <TableCell>{CallType[ticket.call_type]}</TableCell>
-                          <TableCell>
-                            {ticket.created_at.slice(0, 10)}
-                          </TableCell>
-                          <TableCell>{LocationMap[ticket.location]}</TableCell>
-                          <TableCell>
-                            <Button
-                              className="h-7"
-                              variant={TicketStatus[ticket.ticket_status]}
-                            >
-                              {TicketStatus[ticket.ticket_status]}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="w-full flex flex-col gap-5">
-                {currentTickets.map((ticket, index) => (
-                  <Card className="bg-white p-0" key={index}>
-                    <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
-                      <h4>{ticket.ticket_id}</h4>
-                      <Link className="bg-white rounded-full text-gray-500 p-1">
-                        <ChevronRight size={20} />
-                      </Link>
-                    </div>
-                    <CardContent>
-                      <table className="w-full">
-                        <tbody>
-                          <tr>
-                            <CardDescription>Name</CardDescription>
-                            <td className="text-right">
-                              {ticket.customer_name || "N/A"}
-                            </td>
-                          </tr>
-                          <tr>
-                            <CardDescription>Product Type</CardDescription>
-                            <td className="text-right">
-                              {ticket.product_name || "N/A"}
-                            </td>
-                          </tr>
-                          <tr>
-                            <CardDescription>CallType</CardDescription>
-                            <td className="text-right">
-                              {CallType[ticket.call_type] || "N/A"}
-                            </td>
-                          </tr>
-                          <tr>
-                            <CardDescription>Location</CardDescription>
-                            <td className="text-right">
-                              {LocationMap[ticket.location] || "N/A"}
-                            </td>
-                          </tr>
-                          <tr>
-                            <CardDescription>Landmark</CardDescription>
-                            <td className="text-right">
-                              {ticket.landmark || "N/A"}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
+          {isLoading ? (
+            <SkeletonRows rows={4} columns={6} />
+          ) : (
+            <div className="mb-8">
+              {tickets.length === 0 ? (
+                <div className="flex justify-center items-center h-40">
+                  <p className="text-gray-500">No tickets found</p>
+                </div>
+              ) : !isMobile ? (
+                <TicketTable tickets={tickets} />
+              ) : (
+                <TicketMobileView tickets={tickets} />
+              )}
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center justify-between">
             <div>
               <SelectDemo
@@ -309,28 +379,25 @@ const Ticket = () => {
                   { value: 50, label: 50 },
                 ]}
                 value={itemsPerPage}
-                onChange={value => setItemsPerPage(value)}
+                onChange={value =>
+                  setState(prevState => ({
+                    ...prevState,
+                    itemsPerPage: value,
+                  }))
+                }
               />
             </div>
             <div>
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious onClick={handlePreviousPage} />
+                    <PaginationPrevious />
                   </PaginationItem>
-                  {totalPages &&
-                    [...Array(totalPages).keys()].map(number => (
-                      <PaginationItem key={number}>
-                        <PaginationLink
-                          href="#"
-                          isActive={number + 1 === currentPage}
-                        >
-                          {number + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
                   <PaginationItem>
-                    <PaginationNext onClick={handleNextPage} />
+                    <PaginationLink>1</PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

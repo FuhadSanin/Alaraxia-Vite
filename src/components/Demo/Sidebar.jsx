@@ -1,24 +1,50 @@
 // Sidebar component
 import React, { useContext } from "react"
 import logo from "../../assets/logo.svg"
-import { SidebarContext } from "@/layouts/layout"
-import { Link } from "react-router-dom"
+import { SidebarContext } from "@layouts/layout"
+import { Link, useNavigate } from "react-router-dom"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { ChevronRight, User } from "lucide-react"
-import { useAuth } from "@/context/AuthContext"
+import { ChevronRight, LogOut, Settings, User } from "lucide-react"
+import { Home, Ticket, Users, ClipboardMinus } from "lucide-react"
 
-export default function Sidebar({ children }) {
+import { useAuth } from "@context/AuthContext"
+import { Popover, PopoverContent, PopoverTrigger } from "@components/ui/popover"
+import { useToast } from "@components/ui/use-toast"
+import { useMediaQuery } from "react-responsive"
+
+function Sidebar({ children }) {
+  const { authToken, userProfile, setAuthToken, setUserProfile } = useAuth()
   const { expanded } = useContext(SidebarContext)
-  const { authToken } = useAuth()
+  const { toast } = useToast()
+  const navigate = useNavigate()
+  const isMobile = useMediaQuery({ maxWidth: 768 })
+
+  const handlelogout = () => {
+    setAuthToken(null)
+    setUserProfile(null)
+    if (!authToken && !userProfile) {
+      navigate("/login")
+      toast({
+        title: "Success! You are now signed out.",
+        description: "You have successfully signed out.",
+        variant: "success",
+      })
+    }
+  }
 
   return (
     <aside className="h-screen p-8 pr-4">
-      <nav className=" h-full  flex flex-col bg-white border-2 border-[gold] dark:border-[gray] rounded-3xl shadow-xl dark:bg-[#181818]">
+      <nav
+        className={`h-full  flex flex-col bg-white   dark:bg-[#181818] ${
+          !isMobile &&
+          "border-2 border-[gold] dark:border-[gray] rounded-3xl shadow-xl"
+        }`}
+      >
         <div className="p-4 pb-2 flex justify-between items-center">
           <img
             src={logo}
@@ -31,50 +57,63 @@ export default function Sidebar({ children }) {
 
         <ul className="flex-1 px-3 ">{children}</ul>
 
-        {authToken ? (
-          <div className=" flex p-3">
+        <div className=" flex p-3 justify-between items-center">
+          <div className="flex">
             <img
-              src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+              src={`https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true&name=${userProfile.name}`}
               alt=""
               className="w-10 h-10 rounded-md"
             />
-            <Link
-              to="/profile"
+            <div
               className={`
               flex justify-between items-center
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
             >
               <div className="leading-4">
-                <h4 className="font-semibold">John Doe</h4>
+                <h4 className="font-semibold">
+                  {userProfile.name || "User Name"}
+                </h4>
                 <span className="text-xs text-gray-600">
-                  {authToken.user_email}
+                  {userProfile.kind === 5 ? "Administrator" : "Technician"}
                 </span>
               </div>
-            </Link>
+            </div>
           </div>
-        ) : (
-          <div className=" flex p-3 ">
-            <User size={24} strokeWidth={1.5} />
-            <Link
-              to="/login"
-              className={`
-              flex justify-between items-center
-              overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
-          `}
-            >
-              <div className="leading-4">
-                <h4 className="font-semibold">Login</h4>
-              </div>
-            </Link>
+          <div>
+            <Popover>
+              <PopoverTrigger>
+                <Settings size={20} />
+              </PopoverTrigger>
+              <PopoverContent>
+                <ul className="flex flex-col gap-2">
+                  <li>
+                    <Link to="/profile" className="flex items-center gap-2">
+                      <User size={20} />
+                      <span>Profile</span>
+                    </Link>
+                  </li>
+                  <hr />
+                  <li>
+                    <Link
+                      onClick={handlelogout}
+                      className="flex items-center gap-2"
+                    >
+                      <LogOut size={20} />
+                      <span>Logout</span>
+                    </Link>
+                  </li>
+                </ul>
+              </PopoverContent>
+            </Popover>
           </div>
-        )}
+        </div>
       </nav>
     </aside>
   )
 }
 
-export function SidebarSubItem({
+function SidebarSubItem({
   icon,
   text,
   active,
@@ -163,3 +202,88 @@ export function SidebarSubItem({
     </Accordion>
   )
 }
+
+const sidebarConfig = {
+  5: [
+    {
+      icon: <Home size={20} />,
+      text: "Dashboard",
+      to: "/",
+    },
+    {
+      icon: <Ticket size={20} />,
+      text: "Tickets",
+      to: "/ticket",
+      submenus: [
+        { text: "All Tickets", to: "/ticket" },
+        { text: "Open Ticket", to: "/ticket/open" },
+        { text: "Assigned Ticket", to: "/ticket/assigned" },
+        { text: "Pending Ticket", to: "/ticket/pending" },
+        { text: "Cancelled Ticket", to: "/ticket/cancelled" },
+        { text: "Closed Ticket", to: "/ticket/closed" },
+      ],
+    },
+    {
+      icon: <Users size={20} />,
+      text: "User Management",
+      to: "/management/staff",
+      submenus: [
+        { text: "Staff Management", to: "/management/staff" },
+        { text: "Customer Management", to: "/management/customer" },
+      ],
+    },
+    {
+      icon: <ClipboardMinus size={20} />,
+      text: "Reports",
+      to: "/reports",
+    },
+  ],
+  1: [
+    {
+      icon: <Home size={20} />,
+      text: "Dashboard",
+      to: "/",
+    },
+    {
+      icon: <Ticket size={20} />,
+      text: "Assigned Tickets",
+      to: "/ticket/assigned",
+    },
+  ],
+}
+
+const SidebarDemo = () => {
+  const { active, setActive, activeSubmenu, setActiveSubmenu } =
+    useContext(SidebarContext)
+  const { userProfile } = useAuth()
+  const kind = userProfile?.kind
+
+  const renderSidebarItems = items =>
+    items.map(item => (
+      <SidebarSubItem
+        key={item.text}
+        icon={item.icon}
+        text={item.text}
+        active={active === item.text}
+        onClick={() => setActive(item.text)}
+        as={Link}
+        to={item.to}
+        submenus={
+          item.submenus &&
+          item.submenus.map(submenu => ({
+            ...submenu,
+            active: activeSubmenu === submenu.text,
+            onClick: () => setActiveSubmenu(submenu.text),
+          }))
+        }
+      />
+    ))
+
+  return (
+    <Sidebar>
+      {sidebarConfig[kind] ? renderSidebarItems(sidebarConfig[kind]) : null}
+    </Sidebar>
+  )
+}
+
+export default SidebarDemo

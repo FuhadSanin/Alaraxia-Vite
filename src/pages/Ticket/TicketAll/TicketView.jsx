@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from "react"
-import { Card, CardContent } from "@components/ui/card"
-import { CardDescription, CardTitle } from "@components/ui/card"
+import { Link, useParams } from "react-router-dom"
+import { ChevronsLeft } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@components/ui/card"
+import ModalAssign from "./ModalAssign"
+import ModalCancel from "./ModalCancel"
+import ImageUpload from "./ImageUpload"
+import Services from "@services/services"
+import { useAuth } from "@context/AuthContext"
 import {
   Table,
   TableBody,
@@ -9,10 +21,6 @@ import {
   TableRow,
 } from "@components/ui/table"
 import { Button } from "@components/ui/button"
-import ModalAssign from "./ModalAssign"
-import { Link, useParams } from "react-router-dom"
-import Services from "@services/services"
-import { useAuth } from "@context/AuthContext"
 import {
   CallType,
   WarrantyStatus,
@@ -20,43 +28,21 @@ import {
   ServiceType,
   CustomerDemand,
   PendingReasonMap,
+  TicketStatus,
+  CancellationReasonMap,
 } from "@constants/constants"
-import { ChevronsLeft } from "lucide-react"
-import { PendingReason } from "@constants/constants"
-import ModalCancel from "./ModalCancel"
-import ImageUpload from "./ImageUpload"
+import { useQuery } from "@tanstack/react-query"
+import { Skeleton } from "@components/ui/skeleton"
 
 const TicketView = () => {
-  const kind = 1
+  const kind = 5
   const { id } = useParams()
   const { authToken } = useAuth()
+
   const [customer, setCustomer] = useState({})
   const [product, setProduct] = useState({})
   const [ticket, setTicket] = useState({})
   const [technician, setTechnician] = useState("")
-
-  const Demotickets = [
-    {
-      ticketId: "TKT-2024-001",
-      customerName: "Hari Menon",
-      productType: "Air Conditioner",
-      callType: "Installation",
-      createdOn: "Jun 5, 2024",
-      location: "Ernakulam",
-      status: "Pending",
-      customerId: "CUST-1001",
-    },
-    {
-      ticketId: "TKT-2024-002",
-      customerName: "Om Shree",
-      productType: "Refrigerator",
-      callType: "Repair",
-      createdOn: "Jun 5, 2024",
-      location: "Kochi",
-      status: "Completed",
-      customerId: "CUST-1002",
-    },
-  ]
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,6 +92,33 @@ const TicketView = () => {
     fetchData()
   }, [id, authToken])
 
+  const renderTicketActions = () => {
+    if (
+      ticket.ticket_status !== 3 &&
+      ticket.ticket_status !== 6 &&
+      ticket.ticket_status !== 4
+    ) {
+      if (ticket.ticket_status === 5) {
+        return (
+          <div className="flex gap-5">
+            <ModalAssign title="Reassign" id={ticket?.uuid} />
+            <ModalCancel />
+          </div>
+        )
+      } else if (!ticket.assignee) {
+        return <ModalAssign />
+      } else {
+        return (
+          <div>
+            <p className="text-right text-xs text-gray-500">Technician</p>
+            <p className="font-semibold">{technician}</p>
+          </div>
+        )
+      }
+    }
+    return null
+  }
+
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 flex items-center">
@@ -113,13 +126,14 @@ const TicketView = () => {
           <ChevronsLeft className="mr-2" />
         </Link>
         <h1 className="text-2xl font-bold">
-          View
+          View{" "}
           {(ticket?.ticket_status === 5 || ticket?.ticket_status === 3) && (
             <span> Pending </span>
           )}
           Ticket
         </h1>
       </div>
+
       {/* Ticket Details */}
       <Card className="mb-5">
         <CardContent className="flex justify-between items-center">
@@ -138,37 +152,11 @@ const TicketView = () => {
               </ul>
             </div>
           </div>
-          {kind !== 1 ||
-          ticket?.ticket_status !== 4 ||
-          ticket?.ticket_status !== 3 ||
-          ticket?.ticket_status !== 6 ? (
-            <div className="w-full md:w-auto mt-4 md:mt-0">
-              <div className="flex justify-end">
-                {ticket?.ticket_status === 5 ? (
-                  <div className="flex gap-5">
-                    <div>
-                      <ModalAssign title="Reassign" id={ticket?.uuid} />
-                    </div>
-                    <div>
-                      <ModalCancel />
-                    </div>
-                  </div>
-                ) : !ticket?.assignee ? (
-                  <ModalAssign />
-                ) : (
-                  <div>
-                    <p className="text-right text-xs text-gray-500">
-                      Technician
-                    </p>
-                    <p className="font-semibold">{technician}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : null}
+          {renderTicketActions()}
         </CardContent>
       </Card>
-      {/* Customer Details */}
+
+      {/* Customer and Product Details */}
       <div className="flex flex-wrap md:flex-nowrap gap-5 mb-5">
         <Card className="w-full md:w-1/2">
           <CardContent className="flex justify-between items-center">
@@ -323,57 +311,114 @@ const TicketView = () => {
                       </td>
                     </tr>
                   )}
+
+                  {ticket?.ticket_status === 3 && (
+                    <>
+                      <tr>
+                        <CardDescription>Cancelled Reason</CardDescription>
+                        <td className="text-right text-destructive">
+                          {CancellationReasonMap[ticket?.cancellation_reason]}
+                        </td>
+                      </tr>
+                      <tr>
+                        <CardDescription>Ageing</CardDescription>
+                        <td className="text-right">
+                          {ticket?.ageing || "N/A"}
+                        </td>
+                      </tr>
+                    </>
+                  )}
                 </tbody>
               </table>
             )}
           </CardContent>
         </Card>
       </div>
+
       {/* Action Section */}
-      {kind === 1 ? (
-        <ImageUpload />
-      ) : (
-        <Card className="mb-5">
-          <CardTitle> Service History</CardTitle>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableCell>Ticket ID</TableCell>
-                  <TableCell>Customer Name</TableCell>
-                  <TableCell>Product Type</TableCell>
-                  <TableCell>Call Type</TableCell>
-                  <TableCell>Created On</TableCell>
-                  <TableCell>Location</TableCell>
-                  <TableCell>Status</TableCell>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Demotickets?.map((ticket, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{ticket?.ticketId}</TableCell>
-                    <TableCell>{ticket?.customerName}</TableCell>
-                    <TableCell>{ticket?.productType}</TableCell>
-                    <TableCell>{ticket?.callType}</TableCell>
-                    <TableCell>{ticket?.createdOn}</TableCell>
-                    <TableCell>{ticket?.location}</TableCell>
-                    {ticket?.status === "Pending" ? (
-                      <TableCell>
-                        <Button variant="pending">{ticket?.status}</Button>
-                      </TableCell>
-                    ) : (
-                      <TableCell>
-                        <Button variant="success">{ticket?.status}</Button>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
+      {kind === 1 ? <ImageUpload /> : renderServiceHistory(ticket.customer_id)}
     </div>
+  )
+}
+
+const SkeletonRows = ({ rows, columns }) => (
+  <div>
+    {[...Array(rows)].map((_, rowIndex) => (
+      <div key={rowIndex} className="flex p-4 justify-between">
+        {[...Array(columns)].map((_, colIndex) => (
+          <Skeleton key={colIndex} className="h-4 w-32" />
+        ))}
+      </div>
+    ))}
+  </div>
+)
+
+const renderServiceHistory = customer_id => {
+  const { authToken } = useAuth()
+  const {
+    isLoading,
+    error,
+    data: tickets,
+  } = useQuery({
+    querykey: ["tickets", customer_id],
+    queryFn: async () => {
+      if (customer_id) {
+        const response = await Services.getTickets(authToken, {
+          customer_id: customer_id,
+        })
+        return response.data.results
+      }
+    },
+  })
+
+  console.log("tickets", tickets)
+
+  return (
+    <Card className="mb-5">
+      <CardTitle> Service History</CardTitle>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableCell>Last Service Date</TableCell>
+              <TableCell>Ticket No</TableCell>
+              <TableCell>Service Type</TableCell>
+              <TableCell>Technician Assigned</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>Remarks</TableCell>
+              <TableCell>Status</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <SkeletonRows rows={5} columns={7} />
+            ) : (
+              tickets &&
+              tickets.map((ticket, index) => (
+                <TableRow key={index}>
+                  <TableCell>{ticket.ticket_id}</TableCell>
+                  <TableCell className="flex flex-col">
+                    {ticket.ticket_id}
+                  </TableCell>
+                  <TableCell>{ServiceType[ticket.service_type]}</TableCell>
+                  <TableCell>{ticket.assigned_technician_name}</TableCell>
+                  <TableCell>{ticket.phone_number}</TableCell>
+                  <TableCell>{ticket.customer_remarks}</TableCell>
+                  <TableCell>
+                    <Button
+                      className="h-7"
+                      variant={TicketStatus[ticket.ticket_status]}
+                    >
+                      {TicketStatus[ticket.ticket_status]}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>{" "}
+      </CardContent>
+    </Card>
   )
 }
 

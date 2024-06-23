@@ -11,7 +11,8 @@
       "@layouts/*": ["layouts/*"],
       "@services/*": ["services/*"],
       "@context/*": ["context/*"],
-      "@constants/*": ["constants/*"]
+      "@constants/*": ["constants/*"],
+      "@routes/*": ["routes/*"]
     }
   }
 }
