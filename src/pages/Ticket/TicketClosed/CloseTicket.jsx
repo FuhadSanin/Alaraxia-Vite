@@ -18,6 +18,7 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 import { useToast } from "@components/ui/use-toast"
+import { useMutation } from "@tanstack/react-query"
 
 // Define the form schema using Zod
 const FormSchema = z.object({
@@ -56,14 +57,14 @@ const TicketAddForm = ({ onSubmit }) => {
   )
 }
 
-const CloseTicket = ({ id: propId }) => {
+const CloseTicket = ({ id: propId, formData }) => {
+  console.log(formData)
   const { id: routeId } = useParams()
   const { authToken } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
   const [ticketType, setTicketType] = useState("with")
   const id = propId || routeId
-
   const { userProfile } = useAuth()
   const user = userProfile?.kind === 5 ? "close" : "close_by_technician"
 
@@ -79,7 +80,7 @@ const CloseTicket = ({ id: propId }) => {
         description: "The ticket has been closed",
         variant: "success",
       })
-      navigate("/ticket/view/" + id)
+      navigate("/")
     } catch (error) {
       toast({
         title: "Error Closing Ticket",
@@ -91,80 +92,107 @@ const CloseTicket = ({ id: propId }) => {
 
   const handleCloseWithoutCode = () => {
     closeTicket({ with_happy_code: false })
+    if (formData) {
+      mutation.mutate(formData)
+    }
   }
 
   const handleCloseWithCode = data => {
     closeTicket({ with_happy_code: true, happy_code: data.happy_code })
+    if (formData) {
+      mutation.mutate(formData)
+    }
   }
 
+  const mutation = useMutation({
+    mutationFn: async data => {
+      const response = await Services.postVisits(authToken, id, formData)
+      return response.data
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Profile Updated Successfully",
+        variant: "success",
+      })
+      navigate("/")
+    },
+    onError: error => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+      console.log(error)
+    },
+  })
+
   return (
-    <>
-      <Dialog>
-        <DialogTrigger>
-          <Button variant="blue">Close Ticket</Button>
-        </DialogTrigger>
-        <DialogContent className="flex flex-col">
-          <img
-            src={add}
-            alt=""
-            width={80}
-            height={80}
-            className="self-center"
-          />
-          <DialogHeader>
-            <DialogTitle className="mb-5">Confirm Ticket Closure</DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="text-lg">
-            Are you sure you want to close this ticket?
-          </DialogDescription>
-          <div className="flex flex-col items-start pt-2 pb-5">
-            <div className="space-x-2">
-              <input
-                type="radio"
-                id="with-happycode"
-                name="close-type"
-                value="with"
-                checked={ticketType === "with"}
-                onChange={handleTicketTypeChange}
-              />
-              <label
-                htmlFor="with-happycode"
-                className="text-md text-muted-foreground font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                With Happy Code
-              </label>
-            </div>
-            <div className="space-x-2 mt-2">
-              <input
-                type="radio"
-                id="without-happycode"
-                name="close-type"
-                value="without"
-                checked={ticketType === "without"}
-                onChange={handleTicketTypeChange}
-              />
-              <label
-                htmlFor="without-happycode"
-                className="text-md text-muted-foreground font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Without Happy Code
-              </label>
-            </div>
-          </div>
-          {ticketType === "with" ? (
-            <TicketAddForm onSubmit={handleCloseWithCode} />
-          ) : (
-            <Button
-              className="w-full"
-              variant="blue"
-              onClick={handleCloseWithoutCode}
+    <Dialog>
+      <DialogTrigger>
+        <Button variant="blue">Close Ticket</Button>
+      </DialogTrigger>
+      <DialogContent className="flex flex-col">
+        <img
+          src={add}
+          alt="Add"
+          width={80}
+          height={80}
+          className="self-center"
+        />
+        <DialogHeader>
+          <DialogTitle className="mb-5">Confirm Ticket Closure</DialogTitle>
+        </DialogHeader>
+        <DialogDescription className="text-lg">
+          Are you sure you want to close this ticket?
+        </DialogDescription>
+        <div className="flex flex-col items-start pt-2 pb-5">
+          <div className="space-x-2">
+            <input
+              type="radio"
+              id="with-happycode"
+              name="close-type"
+              value="with"
+              checked={ticketType === "with"}
+              onChange={handleTicketTypeChange}
+            />
+            <label
+              htmlFor="with-happycode"
+              className="text-md text-muted-foreground font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Close Ticket
-            </Button>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+              With Happy Code
+            </label>
+          </div>
+          <div className="space-x-2 mt-2">
+            <input
+              type="radio"
+              id="without-happycode"
+              name="close-type"
+              value="without"
+              checked={ticketType === "without"}
+              onChange={handleTicketTypeChange}
+            />
+            <label
+              htmlFor="without-happycode"
+              className="text-md text-muted-foreground font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Without Happy Code
+            </label>
+          </div>
+        </div>
+        {ticketType === "with" ? (
+          <TicketAddForm onSubmit={handleCloseWithCode} />
+        ) : (
+          <Button
+            className="w-full"
+            variant="blue"
+            onClick={handleCloseWithoutCode}
+          >
+            Close Ticket
+          </Button>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
 

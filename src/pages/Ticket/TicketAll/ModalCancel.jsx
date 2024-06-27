@@ -17,6 +17,7 @@ import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 import { useToast } from "@components/ui/use-toast"
 import close from "@assets/Modals/close.png"
+import { useNavigate } from "react-router-dom"
 import { PendingReason } from "@constants/constants"
 // Define the form schema using Zod
 const FormSchema = z.object({
@@ -25,6 +26,7 @@ const FormSchema = z.object({
 
 const TicketAddForm = ({ id }) => {
   const { authToken } = useAuth()
+  const navigat = useNavigate()
   const { toast } = useToast()
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -34,8 +36,11 @@ const TicketAddForm = ({ id }) => {
   })
 
   const onSubmit = data => {
-    console.log(data.cancellation_reason)
     try {
+      data = {
+        cancellation_reason: Number(data.cancellation_reason),
+      }
+      console.log(data)
       Services.cancelTickets(authToken, id, data)
         .then(response => {
           console.log(response)
@@ -44,6 +49,7 @@ const TicketAddForm = ({ id }) => {
             description: "Ticket has been cancelled",
             variant: "success",
           })
+          navigat("/tickets/cancelled")
         })
         .catch(error => {
           console.log(error)

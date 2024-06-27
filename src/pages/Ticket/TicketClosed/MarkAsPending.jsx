@@ -28,13 +28,14 @@ import { useToast } from "@components/ui/use-toast"
 import { SelectDemo } from "@components/Demo/SelectDemo"
 import { PendingReason } from "@constants/constants"
 import { useParams } from "react-router-dom"
+import { useMutation } from "@tanstack/react-query"
 
 // Define the form schema using Zod
 const FormSchema = z.object({
   pending_reason: z.string().min(1, "Pending Reason is required"),
 })
 
-const TicketAddForm = () => {
+const TicketAddForm = ({ formData }) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -46,6 +47,29 @@ const TicketAddForm = () => {
     },
   })
 
+  const mutation = useMutation({
+    mutationFn: async data => {
+      const response = await Services.postVisits(authToken, id, formData)
+      return response.data
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Profile Updated Successfully",
+        variant: "success",
+      })
+      navigate("/")
+    },
+    onError: error => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+      console.log(error)
+    },
+  })
+
   const onSubmit = data => {
     if (authToken) {
       Services.markAsPending(authToken, id, data)
@@ -54,7 +78,7 @@ const TicketAddForm = () => {
             title: "Ticket marked as pending",
             description: "Ticket has been marked as pending successfully",
           })
-          navigate("/ticket/closed")
+          navigate("/ticket/assgined")
         })
         .catch(error => {
           toast({
@@ -62,6 +86,9 @@ const TicketAddForm = () => {
             description: error.response.data.detail,
           })
         })
+    }
+    if (formData) {
+      mutation.mutate(formData)
     }
   }
 
@@ -95,7 +122,7 @@ const TicketAddForm = () => {
   )
 }
 
-const MarkAsPending = () => {
+const MarkAsPending = ({ formData }) => {
   return (
     <>
       <Dialog>
@@ -117,7 +144,7 @@ const MarkAsPending = () => {
               as pending.
             </DialogDescription>
           </DialogHeader>
-          <TicketAddForm />
+          <TicketAddForm formData={formData} />
         </DialogContent>
       </Dialog>
     </>

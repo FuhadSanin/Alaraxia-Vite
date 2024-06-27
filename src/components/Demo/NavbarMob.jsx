@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 
 import { Home, Ticket, Users, ClipboardMinus, Menu } from "lucide-react"
 
-import logo from "@/assets/logo.svg"
+import logo from "@assets/logo.svg"
 import SidebarDemo from "./Sidebar"
 
 const Navbarmob = () => {

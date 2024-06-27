@@ -5,12 +5,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@components/ui/card"
 
 import { ArrowBigUp } from "lucide-react"
 import { useMediaQuery } from "react-responsive"
 
-export const Smallcolorcards = ({ cardcolor }) => {
+export const Smallcolorcards = ({ cardcolor, title, value }) => {
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
   return (
@@ -23,10 +23,12 @@ export const Smallcolorcards = ({ cardcolor }) => {
       }}
     >
       <CardHeader className="pb-0 pt-1">
-        <CardDescription className="text-white">Total Profit</CardDescription>
+        <CardDescription className="text-white">Total {title}</CardDescription>
       </CardHeader>
       <CardContent className="mt-3 pb-0 flex">
-        <CardTitle className="font-extrabold text-white mr-2">14</CardTitle>
+        <CardTitle className="font-extrabold text-white mr-2">
+          {value || 0}
+        </CardTitle>
         <ArrowBigUp strokeWidth={1} className="text-white" />
       </CardContent>
     </Card>

@@ -1,24 +1,21 @@
 import React, { useState } from "react"
 import { useParams } from "react-router-dom"
-
 import MarkAsPending from "../TicketClosed/MarkAsPending"
 import CloseTicket from "../TicketClosed/CloseTicket"
 
 const FileUploadForm = () => {
   const { id } = useParams()
 
-  // State for files (images) and technician remarks
+  // State for images (images) and technician remarks
   const [formData, setFormData] = useState({
-    files: [],
-    technicianRemarks: "",
+    images: [],
+    details: "",
     ticket: id,
   })
   const [imagePreviews, setImagePreviews] = useState([])
 
   // Destructuring state variables for easier access
-  const { files, technicianRemarks, ticket } = formData
-
-  console.log(formData)
+  const { images, details, ticket } = formData
 
   // Function to handle file selection
   const handleFileSelect = async event => {
@@ -91,10 +88,10 @@ const FileUploadForm = () => {
       newPreviews.push(URL.createObjectURL(compressedBlob))
     }
 
-    // Update state with new files and previews
+    // Update state with new images and previews
     setFormData(prev => ({
       ...prev,
-      files: [...prev.files, ...newFiles].slice(0, 3),
+      images: [...prev.images, ...newFiles].slice(0, 3),
     }))
 
     setImagePreviews(prev => [...prev, ...newPreviews])
@@ -107,6 +104,7 @@ const FileUploadForm = () => {
 
   // Function to handle drop event
   const handleDrop = event => {
+    event.preventDefault()
     handleFileSelect(event)
   }
 
@@ -114,7 +112,7 @@ const FileUploadForm = () => {
   const handleRemoveImage = index => {
     setFormData(prev => ({
       ...prev,
-      files: prev.files.filter((_, i) => i !== index),
+      images: prev.images.filter((_, i) => i !== index),
     }))
     setImagePreviews(imagePreviews.filter((_, i) => i !== index))
   }
@@ -186,18 +184,18 @@ const FileUploadForm = () => {
       </form>
       <h1 className="text-xl font-medium mb-3 mt-3">Technician Remarks</h1>
       <textarea
-        className="w-full h-32 p-3 border dark:bg-[#181818]  rounded-xl"
+        className="w-full h-32 p-3 border dark:bg-[#181818] rounded-xl"
         placeholder="Enter your remarks here"
-        value={technicianRemarks}
+        value={details}
         onChange={e =>
           setFormData(prev => ({
             ...prev,
-            technicianRemarks: e.target.value,
+            details: e.target.value,
           }))
         }
       ></textarea>
       <div className="mt-5 flex justify-between">
-        {/* Pass files and technicianRemarks as props to CloseTicket */}
+        <MarkAsPending formData={formData} />
         <CloseTicket formData={formData} />
       </div>
     </>

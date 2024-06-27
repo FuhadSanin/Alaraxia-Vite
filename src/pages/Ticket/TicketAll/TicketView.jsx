@@ -35,9 +35,9 @@ import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@components/ui/skeleton"
 
 const TicketView = () => {
-  const kind = 5
   const { id } = useParams()
-  const { authToken } = useAuth()
+  const { authToken, userProfile } = useAuth()
+  const kind = userProfile.kind
 
   const [customer, setCustomer] = useState({})
   const [product, setProduct] = useState({})
@@ -94,6 +94,7 @@ const TicketView = () => {
 
   const renderTicketActions = () => {
     if (
+      kind !== 1 &&
       ticket.ticket_status !== 3 &&
       ticket.ticket_status !== 6 &&
       ticket.ticket_status !== 4
@@ -122,9 +123,10 @@ const TicketView = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 flex items-center">
-        <Link to="/ticket" className="flex">
+        <Link to="#" onClick={() => window.history.back()} className="flex">
           <ChevronsLeft className="mr-2" />
         </Link>
+
         <h1 className="text-2xl font-bold">
           View{" "}
           {(ticket?.ticket_status === 5 || ticket?.ticket_status === 3) && (
@@ -223,7 +225,7 @@ const TicketView = () => {
                   <tr>
                     <CardDescription>Created On</CardDescription>
                     <td className="text-right">
-                      {customer?.created_at || "N/A"}
+                      {customer?.created_at?.slice(0, 10) || "N/A"}
                     </td>
                   </tr>
                 </tbody>
@@ -294,13 +296,13 @@ const TicketView = () => {
                   <tr>
                     <CardDescription>Appointment date</CardDescription>
                     <td className="text-right">
-                      {ticket?.created_at || "N/A"}
+                      {ticket?.created_at?.slice(0, 10) || "N/A"}
                     </td>
                   </tr>
                   <tr>
                     <CardDescription>Appointment Time</CardDescription>
                     <td className="text-right">
-                      {ticket?.created_at || "N/A"}
+                      {ticket?.created_at?.slice(11, 16) || "N/A"}
                     </td>
                   </tr>
                   {ticket?.ticket_status === 5 && (

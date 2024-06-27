@@ -2,7 +2,7 @@
 "use client"
 import React from "react"
 import { Menu, ChevronLast } from "lucide-react"
-import { ModeToggle } from "@/components/ui/mode-toggle"
+import { ModeToggle } from "@components/ui/mode-toggle"
 
 const Header = ({ expanded, toggleExpanded }) => {
   return (

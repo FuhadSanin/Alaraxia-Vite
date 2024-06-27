@@ -3,11 +3,9 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
+} from "@components/ui/card"
 
 export const Smallcards = () => {
   return (
@@ -18,9 +16,6 @@ export const Smallcards = () => {
       <CardContent className="pt-1 pb-1">
         <CardDescription>This Week</CardDescription>
       </CardContent>
-      <CardFooter className="pt-1 pb-2">
-        <Progress value={50} aria-label="25% increase " />
-      </CardFooter>
     </Card>
   )
 }

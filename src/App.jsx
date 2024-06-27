@@ -15,6 +15,7 @@ function App() {
     if (!authToken) {
       return UnauthenticatedRoutes()
     }
+    console.log(userProfile)
     switch (userProfile?.kind) {
       case 5:
         return Admin()

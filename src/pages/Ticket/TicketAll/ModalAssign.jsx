@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@components/ui/form"
 import { SelectDemo } from "@components/Demo/SelectDemo"
-import { Card, CardContent } from "@components/ui/card"
+import { Card, CardContent, CardDescription } from "@components/ui/card"
 import { Button } from "@components/ui/button"
 import { Input } from "@components/ui/input"
 import { useParams } from "react-router-dom"
@@ -26,6 +26,8 @@ import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 import { useToast } from "@components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+
 // Define the form schema using Zod
 const FormSchema = z.object({
   assignee: z.string().min(1, "Technician is required"),
@@ -34,7 +36,7 @@ const FormSchema = z.object({
   to_time: z.string().min(1, "To Time is required"),
 })
 
-const TicketAddForm = ({ technicians, id, title }) => {
+const TicketAddForm = ({ technicians, id, title, closeModal }) => {
   const navigate = useNavigate()
   const { authToken } = useAuth()
   const { toast } = useToast()
@@ -49,7 +51,6 @@ const TicketAddForm = ({ technicians, id, title }) => {
   })
 
   const onSubmit = data => {
-    console.log(data)
     try {
       Services.assignTech(authToken, id, data)
         .then(response => {
@@ -59,7 +60,7 @@ const TicketAddForm = ({ technicians, id, title }) => {
             description: "Technician has been assigned to the ticket",
             variant: "success",
           })
-          navigate(`/ticket/view/${id}`)
+          closeModal()
         })
         .catch(error => {
           console.log(error)
@@ -87,7 +88,7 @@ const TicketAddForm = ({ technicians, id, title }) => {
             <FormItem>
               <FormLabel>Technician</FormLabel>
               <SelectDemo
-                label="Select Techinician"
+                label="Select Technician"
                 width={80}
                 options={technicians}
                 value={field.value}
@@ -109,7 +110,7 @@ const TicketAddForm = ({ technicians, id, title }) => {
             </FormItem>
           )}
         />
-        <FormLabel>Sheduled Time</FormLabel>
+        <FormLabel>Scheduled Time</FormLabel>
         <div className="flex w-full justify-between">
           <FormField
             control={form.control}
@@ -137,9 +138,11 @@ const TicketAddForm = ({ technicians, id, title }) => {
           />
         </div>
         <div className="flex gap-4 pt-5">
-          <Button variant="secondary" className="w-1/2" type="button">
-            Cancel
-          </Button>
+          <DialogPrimitive.Close className="w-full">
+            <Button variant="secondary" className="w-full" type="button">
+              Cancel
+            </Button>
+          </DialogPrimitive.Close>
           <Button className="w-1/2" type="submit" variant="blue">
             {title} Technician
           </Button>
@@ -148,11 +151,13 @@ const TicketAddForm = ({ technicians, id, title }) => {
     </Form>
   )
 }
+
 const ModalAssign = ({ id: propId, title }) => {
   const { id: routeId } = useParams()
   const { authToken } = useAuth()
   const [ticket, setTicket] = useState(null)
   const [technicians, setTechnicians] = useState([])
+  const [open, setOpen] = useState(false) // State to control dialog visibility
 
   const id = propId || routeId
   useEffect(() => {
@@ -186,7 +191,7 @@ const ModalAssign = ({ id: propId, title }) => {
 
   return (
     <>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger>
           <Button variant="blue" className="h-8">
             {title || "Assign Technician"}
@@ -194,16 +199,18 @@ const ModalAssign = ({ id: propId, title }) => {
         </DialogTrigger>
         <DialogContent className="flex flex-col">
           <DialogHeader>
-            <DialogTitle className="mb-3">{title} Technician</DialogTitle>
+            <DialogTitle className="mb-3 text-md">
+              {title} Technician
+            </DialogTitle>
             <Card className="dark:bg-background ">
               <CardContent className="flex  items-center p-0">
                 <div className="flex flex-col ">
                   <h6 className="font-bold text-left">
                     {ticket?.customer_name}
                   </h6>
-                  <ul className="list-none flex  space-x-3">
+                  <ul className="list-none flex text-sm  space-x-3">
                     <li className="flex items-center text-gray-500">
-                      <span className="text-blue-500 mr-1">&#9679;</span>
+                      <span className="text-blue-500  mr-1">&#9679;</span>
                       {ticket?.customer_id}
                     </li>
                     <li className="flex items-center text-gray-500">
@@ -214,8 +221,39 @@ const ModalAssign = ({ id: propId, title }) => {
                 </div>
               </CardContent>
             </Card>
+            <Card className="dark:bg-background ">
+              <CardContent className="flex  items-center p-0">
+                <h6 className="text-sm font-medium">Customer Details</h6>
+              </CardContent>
+              <hr className="mt-3 mb-3" />
+              <CardContent className="flex  items-center p-0">
+                <table className="w-full">
+                  <tbody>
+                    <tr className="flex justify-between items-center">
+                      <CardDescription>Technician Name</CardDescription>
+                      <td className="text-right font-medium">
+                        {ticket?.assigned_technician_name}
+                      </td>
+                    </tr>
+                    <tr>
+                      <CardDescription>Scheduled Date</CardDescription>
+                      <td className="text-right">{ticket?.scheduled_date}</td>
+                    </tr>
+                    <tr>
+                      <CardDescription>Scheduled Time</CardDescription>
+                      <td className="text-right"> {ticket?.from_time}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
             <div className="pt-5">
-              <TicketAddForm technicians={technicians} id={id} title={title} />
+              <TicketAddForm
+                technicians={technicians}
+                id={id}
+                title={title}
+                closeModal={() => setOpen(false)} // Pass the function to close the dialog
+              />
             </div>
           </DialogHeader>
         </DialogContent>

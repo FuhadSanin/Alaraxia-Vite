@@ -121,7 +121,7 @@ const TicketTable = ({ tickets }) => (
             <TableCell>{ticket.product_name}</TableCell>
             <TableCell>{CallType[ticket.call_type]}</TableCell>
             <TableCell>{LocationMap[ticket.location]}</TableCell>
-            <TableCell>{ticket.ageing} </TableCell>
+            <TableCell>{ticket.aging} </TableCell>
             <TableCell>{ticket.assigned_technician_name}</TableCell>
             <TableCell>
               <div className="flex gap-3 items-center cursor-pointer">

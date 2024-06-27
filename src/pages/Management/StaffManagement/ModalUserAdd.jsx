@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -21,29 +21,65 @@ import {
 } from "@components/ui/form"
 import { Button } from "@components/ui/button"
 import { Plus } from "lucide-react"
-import add from "@assets/Modals/addPeople.png"
+import add from "@assets/Modals/addUser.png"
 import { Input } from "@components/ui/input"
 import { Link, useNavigate } from "react-router-dom"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useToast } from "@components/ui/use-toast"
+import { SelectDemo } from "@components/Demo/SelectDemo"
+import Services from "@services/services"
+import { useAuth } from "@context/AuthContext"
 
 // Define the form schema using Zod
 const FormSchema = z.object({
-  id: z.string().min(1, "Customer ID is required"),
   name: z.string().min(1, "Customer Name is required"),
+  phone_number: z.string().min(1, "Phone Number is required"),
+  email: z.string().email("Invalid email address"),
+  // location: z.string().min(1, "Location is required"),
+  kind: z.string().min(1, "Kind is required"),
 })
 
 const TicketAddForm = () => {
-  const navigate = useNavigate()
+  const { authToken } = useAuth()
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      id: "",
       name: "",
+      phone_number: "",
+      email: "",
+      kind: "",
+    },
+  })
+
+  const mutation = useMutation({
+    mutationFn: async data => {
+      const response = await Services.addUser(authToken, data)
+      console.log(response)
+      return response.data
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Added",
+        description: "User has been added",
+        variant: "success",
+      })
+      queryClient.invalidateQueries(["users"]) // Invalidate user list query to refresh data
+    },
+    onError: error => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+      console.log(error)
     },
   })
 
   const onSubmit = data => {
     console.log(data)
-    navigate("/ticket/add")
+    mutation.mutate(data)
   }
 
   return (
@@ -54,24 +90,23 @@ const TicketAddForm = () => {
       >
         <FormField
           control={form.control}
-          name="id"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Customer ID</FormLabel>
+              <FormLabel>Full Name</FormLabel>
               <FormControl>
                 <Input type="text" {...field} />
               </FormControl>
               <FormMessage />
-              <FormDescription className="text-right text-blue-500 cursor-pointer"></FormDescription>
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="name"
+          name="phone_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Customer Name</FormLabel>
+              <FormLabel>Phone Number</FormLabel>
               <FormControl>
                 <Input type="text" {...field} />
               </FormControl>
@@ -79,8 +114,53 @@ const TicketAddForm = () => {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="kind"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>User Role</FormLabel>
+              <SelectDemo
+                label="User Role"
+                width={80}
+                options={[
+                  { label: "Technician", value: "1" },
+                  { label: "Admin", value: "5" },
+                ]}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            </FormItem>
+          )}
+        />
+        {/* <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input type="text" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        /> */}
         <Button type="submit" variant="blue">
-          Continue
+          Invite
         </Button>
       </form>
     </Form>
@@ -114,50 +194,8 @@ const ModalUserAdd = () => {
             className="self-center "
           />
           <DialogHeader>
-            <DialogTitle>Is the customer...</DialogTitle>
-            <p className="text-left">Customer type</p>
-            <div className="flex items-center space-x-2 pt-2 pb-2">
-              <input
-                type="radio"
-                id="new-customer"
-                name="customer-type"
-                value="new"
-                checked={customerType === "new"}
-                onChange={handleCustomerTypeChange}
-              />
-              <label
-                htmlFor="new-customer"
-                className="text-sm text-muted-foreground font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                New Customer
-              </label>
-              <input
-                type="radio"
-                id="existing-customer"
-                name="customer-type"
-                value="existing"
-                checked={customerType === "existing"}
-                onChange={handleCustomerTypeChange}
-                className="ml-2"
-              />
-              <label
-                htmlFor="existing-customer"
-                className="text-sm text-muted-foreground font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Existing Customer
-              </label>
-            </div>
-            {customerType === "existing" ? (
-              <div>
-                <TicketAddForm />
-              </div>
-            ) : (
-              customerType === "new" && (
-                <Link to="/ticket/add">
-                  <Button variant="blue">Continue</Button>
-                </Link>
-              )
-            )}
+            <DialogTitle>Add New User...</DialogTitle>
+            <TicketAddForm />
           </DialogHeader>
         </DialogContent>
       </Dialog>

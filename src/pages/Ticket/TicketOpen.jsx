@@ -371,14 +371,16 @@ const TicketOpen = () => {
             <SkeletonRows rows={4} columns={6} />
           ) : (
             <div className="mb-8">
-              {tickets.length === 0 ? (
+              {tickets.length > 0 ? (
+                isMobile ? (
+                  <TicketMobileView tickets={tickets} />
+                ) : (
+                  <TicketTable tickets={tickets} />
+                )
+              ) : (
                 <div className="flex justify-center items-center h-40">
                   <p className="text-gray-500">No tickets found</p>
                 </div>
-              ) : !isMobile ? (
-                <TicketTable tickets={tickets} />
-              ) : (
-                <TicketMobileView tickets={tickets} />
               )}
             </div>
           )}

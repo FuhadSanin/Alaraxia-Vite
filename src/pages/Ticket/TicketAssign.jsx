@@ -143,7 +143,10 @@ const TicketMobileView = ({ tickets }) => (
       <Card className="bg-white p-0" key={index}>
         <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
           <h4>{ticket.ticket_id}</h4>
-          <Link className="bg-white rounded-full text-gray-500 p-1">
+          <Link
+            to={"/ticket/view/" + ticket.uuid}
+            className="bg-white rounded-full text-gray-500 p-1"
+          >
             <ChevronRight size={20} />
           </Link>
         </div>
@@ -159,20 +162,29 @@ const TicketMobileView = ({ tickets }) => (
                 <td className="text-right">{ticket.product_name || "N/A"}</td>
               </tr>
               <tr>
-                <CardDescription>CallType</CardDescription>
+                <CardDescription>Assgined On</CardDescription>
                 <td className="text-right">
-                  {CallType[ticket.call_type] || "N/A"}
+                  {ticket.assigned_on?.slice(0, 10) || "N/A"}
                 </td>
               </tr>
               <tr>
-                <CardDescription>Location</CardDescription>
+                <CardDescription>Address</CardDescription>
                 <td className="text-right">
-                  {LocationMap[ticket.location] || "N/A"}
+                  {`${ticket.house_number}, ${ticket.street}, ${
+                    LocationMap[ticket.location] || "N/A"
+                  }`}
                 </td>
               </tr>
               <tr>
-                <CardDescription>Landmark</CardDescription>
-                <td className="text-right">{ticket.landmark || "N/A"}</td>
+                <CardDescription>Status</CardDescription>
+                <td className="text-right">
+                  <Button
+                    variant={`${TicketStatus[ticket.ticket_status]}`}
+                    className="h-6 w-20"
+                  >
+                    {TicketStatus[ticket.ticket_status] || "N/A"}
+                  </Button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -332,30 +344,21 @@ const TicketAssign = () => {
                       <SlidersHorizontal className="mr-2" /> Filter
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="flex flex-col">
+                  <DialogContent className="flex flex-col ">
                     <DialogHeader>
                       <DialogTitle className="mb-3">Filter</DialogTitle>
-                      <Card className="mb-5">
-                        <CardContent className="flex items-center p-0">
-                          <div className="flex flex-col">
-                            <h6 className="font-bold text-left">Hari Menon</h6>
-                            <ul className="list-none flex space-x-3">
-                              <li className="flex items-center text-gray-500">
-                                <span className="text-blue-500 mr-1">
-                                  &#9679;
-                                </span>
-                                ACI-14275
-                              </li>
-                              <li className="flex items-center text-gray-500">
-                                <span className="text-blue-500 mr-1">
-                                  &#9679;
-                                </span>
-                                T-14275
-                              </li>
-                            </ul>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <div className="flex flex-col items-center gap-2">
+                        <DatePickerDemo
+                          placeholder="From Date"
+                          onSelectDate={handleFromDate}
+                        />
+
+                        <span className="text-gray-600">To</span>
+                        <DatePickerDemo
+                          placeholder="To Date"
+                          onSelectDate={handleToDate}
+                        />
+                      </div>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>

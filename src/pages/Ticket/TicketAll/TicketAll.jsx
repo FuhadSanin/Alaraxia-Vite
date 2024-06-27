@@ -35,7 +35,6 @@ import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Input } from "@components/ui/input"
 import { useQuery } from "@tanstack/react-query"
-import { data } from "autoprefixer"
 
 const useTicketsQuery = (
   authToken,

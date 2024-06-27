@@ -70,7 +70,7 @@ const useTicketsQuery = (
           created_at_after: selectedFromDate,
           created_at_before: selectedToDate,
           ticket_status: 4,
-          with_happy_code: true,
+          closed_with_happy_code: true,
         }
         response = await Services.getTickets(authToken, data)
 
@@ -123,7 +123,7 @@ const TicketTable = ({ tickets }) => (
             <TableCell>{ticket.product_name}</TableCell>
             <TableCell>{CallType[ticket.call_type]}</TableCell>
             <TableCell>{LocationMap[ticket.location]}</TableCell>
-            <TableCell>{ticket.ageing}</TableCell>
+            <TableCell>{ticket.aging}</TableCell>
             <TableCell>{ticket.assigned_technician_name}</TableCell>
             <TableCell>{ticket.close_date?.slice(0, 10)}</TableCell>
             <TableCell>

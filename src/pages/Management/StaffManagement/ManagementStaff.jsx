@@ -1,16 +1,14 @@
-// app/Dashboard/Dashboard.js
-import React, { useEffect, useState } from "react"
+import React, { useState, useEffect } from "react"
+import { useMediaQuery } from "react-responsive"
+import { Skeleton } from "@components/ui/skeleton"
 import { SelectDemo } from "@components/Demo/SelectDemo"
-import { Card, CardContent } from "@components/ui/card"
-import { DatePickerDemo } from "@components/ui/datepicker"
+import { Card, CardContent, CardDescription } from "@components/ui/card"
 import { Button } from "@components/ui/button"
-import { Command, CommandInput } from "@components/ui/command"
 import {
   Table,
   TableBody,
   TableCell,
   TableHeader,
-  TableHead,
   TableRow,
 } from "@components/ui/table"
 import {
@@ -21,183 +19,355 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@components/ui/pagination"
-//icons
-import { Plus, Download, Eye, Pencil, EllipsisVertical } from "lucide-react"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
+import { CallType, LocationMap, TicketStatus } from "@constants/constants"
+import { Download, SlidersHorizontal, Archive } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Input } from "@components/ui/input"
+import { useQuery } from "@tanstack/react-query"
+import { Eye, Pencil, EllipsisVertical } from "lucide-react"
 import ModalUserAdd from "./ModalUserAdd"
+import ModalUserDelete from "./ModalUserDelete"
+
+const useUsersQuery = (
+  authToken,
+  itemsPerPage,
+  searchInput,
+  selectedLocation
+) => {
+  return useQuery({
+    queryKey: ["users", authToken, itemsPerPage, searchInput, selectedLocation],
+    queryFn: async () => {
+      try {
+        const data = {
+          limit: itemsPerPage,
+          search: searchInput,
+          location: selectedLocation,
+        }
+        const response = await Services.getUsers(authToken, data)
+        return response.data.results
+      } catch (error) {
+        throw new Error(`Failed to fetch users: ${error.message}`)
+      }
+    },
+  })
+}
+
+const SkeletonRows = ({ rows, columns }) => (
+  <div>
+    {[...Array(rows)].map((_, rowIndex) => (
+      <div key={rowIndex} className="flex p-4 justify-between">
+        {[...Array(columns)].map((_, colIndex) => (
+          <Skeleton key={colIndex} className="h-4 w-32" />
+        ))}
+      </div>
+    ))}
+  </div>
+)
+
+const UserTable = ({ users }) => (
+  <Table>
+    <TableHeader>
+      <TableRow>
+        <TableCell>Staff Name</TableCell>
+        <TableCell>User Role</TableCell>
+        <TableCell>Email Address</TableCell>
+        <TableCell>Phone</TableCell>
+        <TableCell>Location</TableCell>
+        <TableCell>Action</TableCell>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {users.map((user, index) => (
+        <TableRow key={index}>
+          <TableCell>{user.name}</TableCell>
+          <TableCell>{user.kind}</TableCell>
+          <TableCell>{user.email}</TableCell>
+          <TableCell>{user.phone_number}</TableCell>
+          <TableCell>{user.location || "N/A"}</TableCell>
+          <TableCell>
+            <div className="flex gap-3 items-center cursor-pointer">
+              <Eye size={20} />
+              <Pencil size={20} />
+              <ModalUserDelete id={user.uuid} />
+            </div>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+)
+
+const UserMobileView = ({ users }) => (
+  <div className="w-full flex flex-col gap-5">
+    {users.map((user, index) => (
+      <Card className="bg-white p-0" key={index}>
+        <div className="flex bg-[#0C2556] mb-5 text-white p-5 rounded-t-3xl items-center justify-between">
+          <h4>{user.user_id}</h4>
+          <Link className="bg-white rounded-full text-gray-500 p-1">
+            <ChevronRight size={20} />
+          </Link>
+        </div>
+        <CardContent>
+          <table className="w-full">
+            <tbody>
+              <tr>
+                <CardDescription>Name</CardDescription>
+                <td className="text-right">{user.customer_name || "N/A"}</td>
+              </tr>
+              <tr>
+                <CardDescription>Product Type</CardDescription>
+                <td className="text-right">{user.product_name || "N/A"}</td>
+              </tr>
+              <tr>
+                <CardDescription>CallType</CardDescription>
+                <td className="text-right">
+                  {CallType[user.call_type] || "N/A"}
+                </td>
+              </tr>
+              <tr>
+                <CardDescription>Location</CardDescription>
+                <td className="text-right">
+                  {LocationMap[user.location] || "N/A"}
+                </td>
+              </tr>
+              <tr>
+                <CardDescription>Landmark</CardDescription>
+                <td className="text-right">{user.landmark || "N/A"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+)
 
 const ManagementStaff = () => {
   const { authToken } = useAuth()
-  const [users, setUsers] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
+  const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  const itemsPerPage = 10
+  const [state, setState] = useState({
+    searchInput: "",
+    selectedLocation: undefined,
+    itemsPerPage: 5,
+  })
+
+  const { searchInput, selectedLocation, itemsPerPage } = state
+
+  const {
+    isLoading,
+    isError,
+    error,
+    data: users,
+  } = useUsersQuery(authToken, itemsPerPage, searchInput, selectedLocation)
+
+  const { data: locations } = useQuery({
+    queryKey: ["locations", authToken],
+    queryFn: async () => {
+      const response = await Services.getLocations(authToken)
+      const mappedLocations = response.data.results.map(location => ({
+        value: location.uuid,
+        label: location.name,
+      }))
+      return mappedLocations
+    },
+  })
+
+  const {
+    data: userSummary,
+    isLoading: isLoadingUserSummary,
+    isError: isErrorUserSummary,
+  } = useQuery({
+    queryKey: ["userSummary", authToken],
+    queryFn: async () => {
+      const response = await Services.getUsersSummary(authToken)
+      return response.data
+    },
+  })
 
   useEffect(() => {
-    // Fetch users data from API when authToken changes
-    const fetchUsers = async () => {
-      try {
-        const response = await Services.getUsers(authToken)
-        setUsers(response.data.results)
-      } catch (error) {
-        console.error("Error fetching users:", error)
-      }
+    const handler = setTimeout(() => {
+      setState(prevState => ({
+        ...prevState,
+        debouncedSearchInput: searchInput,
+      }))
+    }, 500)
+
+    return () => {
+      clearTimeout(handler)
     }
-    fetchUsers()
-  }, [authToken])
-  console.log(users)
+  }, [searchInput])
 
-  // const data = useQuery({
-  //   queryKey: ["users"],
-  //   queryFn: Services.getUsers(authToken),
-  // })
-  // console.log(data)
-  // Pagination logic
-  const indexOfLastUser = currentPage * itemsPerPage
-  const indexOfFirstUser = indexOfLastUser - itemsPerPage
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser)
-  const totalPages = Math.ceil(users.length / itemsPerPage)
-
-  const handleNextPage = () => {
-    setCurrentPage(currentPage + 1)
+  const handleSearchInputChange = e => {
+    const { value } = e.target
+    setState(prevState => ({
+      ...prevState,
+      searchInput: value,
+    }))
   }
 
-  const handlePreviousPage = () => {
-    setCurrentPage(currentPage - 1)
+  if (isError) {
+    return (
+      <div className="container mx-auto p-4">
+        <p>
+          Something went wrong. Please try again later.
+          <br />
+          Error: {error.message}
+        </p>
+      </div>
+    )
   }
+
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 md:mb-0">
         <h1 className="text-2xl font-bold mb-4">Staff Management</h1>
       </div>
+
       <Card>
-        <CardContent>
-          <div class="p-4 mb-8">
-            <div class="flex flex-wrap">
-              <div class="w-full md:w-1/4 border-b-2 border-green-500">
-                <div class="p-3 flex justify-between items-center">
-                  <h6 class="text-green-500">
-                    Total <br />
-                    Technicians
-                  </h6>
-                  <h3 class="text-green-500 text-3xl font-semibold">18</h3>
+        <CardContent className="p-0">
+          {
+            // User Summary
+            isLoadingUserSummary ? (
+              <div>Loading...</div>
+            ) : isErrorUserSummary ? (
+              <div>Error loading user summary</div>
+            ) : (
+              <div class="p-4 mb-8">
+                <div class="flex flex-wrap">
+                  <div class="w-full md:w-1/4 border-b-2 border-green-500">
+                    <div class="p-3 flex justify-between items-center">
+                      <h6 class="text-green-500">
+                        Total <br />
+                        Technicians
+                      </h6>
+                      <h3 class="text-green-500 text-3xl font-semibold">
+                        {userSummary["Technician"]}
+                      </h3>
+                    </div>
+                  </div>
+                  <div class="w-full md:w-1/4 border-b-2 border-orange-500">
+                    <div class="p-3 flex justify-between items-center">
+                      <h6 class="text-orange-500">
+                        Total Customer <br />
+                        Care Officers
+                      </h6>
+                      <h3 class="text-orange-500 text-3xl font-semibold">
+                        {userSummary["Customer Care Officer"]}
+                      </h3>
+                    </div>
+                  </div>
+                  <div class="w-full md:w-1/4 border-b-2 dark:border-white border-gray-800">
+                    <div class="p-3 flex justify-between items-center">
+                      <h6 class="text-gray-800 dark:text-white">
+                        Total Area Service
+                        <br />
+                        Managers
+                      </h6>
+                      <h3 class="text-gray-800 dark:text-white text-3xl font-semibold">
+                        {userSummary["Customer Care Agent"]}
+                      </h3>
+                    </div>
+                  </div>
+                  <div class="w-full md:w-1/4 border-b-2 border-red-500">
+                    <div class="p-3 flex justify-between items-center">
+                      <h6 class="text-red-500">
+                        Total Call Centre <br />
+                        Agents
+                      </h6>
+                      <h3 class="text-red-500 text-3xl font-semibold">
+                        {userSummary["Area Service Manager"]}
+                      </h3>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="w-full md:w-1/4 border-b-2 border-orange-500">
-                <div class="p-3 flex justify-between items-center">
-                  <h6 class="text-orange-500">
-                    Total Customer <br />
-                    Care Officers
-                  </h6>
-                  <h3 class="text-orange-500 text-3xl font-semibold">18</h3>
-                </div>
-              </div>
-              <div class="w-full md:w-1/4 border-b-2 border-gray-800">
-                <div class="p-3 flex justify-between items-center">
-                  <h6 class="text-gray-800">
-                    Total Area Service
-                    <br />
-                    Managers
-                  </h6>
-                  <h3 class="text-gray-800 text-3xl font-semibold">18</h3>
-                </div>
-              </div>
-              <div class="w-full md:w-1/4 border-b-2 border-red-500">
-                <div class="p-3 flex justify-between items-center">
-                  <h6 class="text-red-500">
-                    Total Call Centre <br />
-                    Agents
-                  </h6>
-                  <h3 class="text-red-500 text-3xl font-semibold">18</h3>
-                </div>
-              </div>
-            </div>
-          </div>
+            )
+          }
 
           <div className="flex flex-wrap justify-between items-center mb-8">
             <div className="w-fit">
-              <Command className="rounded-full border ">
-                <CommandInput placeholder="Search Customers" />
-              </Command>
+              <Input
+                placeholder="Search Customer"
+                value={searchInput}
+                onChange={handleSearchInputChange}
+              />
             </div>
-            <div className="flex flex-wrap gap-5 items-center justify-center">
-              <div>
-                <SelectDemo label="Location" />
+            <div className="flex gap-5 items-center justify-center">
+              <div className="flex">
+                <SelectDemo
+                  label="Location"
+                  options={locations}
+                  value={selectedLocation}
+                  onChange={value =>
+                    setState(prevState => ({
+                      ...prevState,
+                      selectedLocation: value,
+                    }))
+                  }
+                />
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <DatePickerDemo placeholder="From Date" />
-                <span className="text-gray-600">To</span>
-                <DatePickerDemo placeholder="To Date" />
-              </div>
-              <div>
-                <ModalUserAdd />
-              </div>
-              <div>
-                <Button variant="secondary">
-                  Export{" "}
-                  <span className="ml-2">
-                    <Download strokeWidth={1.2} />
-                  </span>
-                </Button>
-              </div>
+              <SelectDemo
+                label="User Role"
+                options={locations}
+                value={selectedLocation}
+                onChange={value =>
+                  setState(prevState => ({
+                    ...prevState,
+                    selectedLocation: value,
+                  }))
+                }
+              />
+              <ModalUserAdd />
+              <Button variant="secondary">
+                Export
+                <span className="ml-2">
+                  <Download strokeWidth={1.2} />
+                </span>
+              </Button>
             </div>
           </div>
-          <div className="mb-8">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableCell>Staff Name</TableCell>
-                  <TableCell>User Role</TableCell>
-                  <TableCell>Email Address</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Location</TableCell>
-                  <TableCell>Action</TableCell>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentUsers.map((user, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{user.staffName}</TableCell>
-                    <TableCell>{user.userRole}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone}</TableCell>
-                    <TableCell>{user.location}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-3 items-center cursor-pointer">
-                        <Eye size={20} />
-                        <Pencil size={20} />
-                        <EllipsisVertical size={20} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex flex-wrap items-center justify-between">
+          {isLoading ? (
+            <SkeletonRows rows={5} columns={7} />
+          ) : (
+            <>
+              {isMobile ? (
+                <UserMobileView users={users} />
+              ) : (
+                <UserTable users={users} />
+              )}
+            </>
+          )}
+          <div className="flex flex-wrap items-center justify-between mt-5">
             <div>
-              <SelectDemo label="10" />
+              <SelectDemo
+                options={[
+                  { value: 5, label: 5 },
+                  { value: 10, label: 10 },
+                  { value: 50, label: 50 },
+                ]}
+                value={itemsPerPage}
+                onChange={value =>
+                  setState(prevState => ({
+                    ...prevState,
+                    itemsPerPage: value,
+                  }))
+                }
+              />
             </div>
             <div>
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious onClick={handlePreviousPage} />
+                    <PaginationPrevious />
                   </PaginationItem>
-                  {[...Array(totalPages).keys()].map(number => (
-                    <PaginationItem key={number}>
-                      <PaginationLink
-                        href="#"
-                        isActive={number + 1 === currentPage}
-                        onClick={() => setCurrentPage(number + 1)}
-                      >
-                        {number + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
                   <PaginationItem>
-                    <PaginationNext onClick={handleNextPage} />
+                    <PaginationLink>1</PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

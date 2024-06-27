@@ -65,13 +65,14 @@ const CancellationReason = [
 ]
 
 const LocationMap = {
-  "2741c98b-1313-45f5-aa70-26db4227ccec": "Hyderabad",
-  "a9f48006-34b5-463f-a248-c7667ecd5b9f": "Kochi",
-  "ecfe9b23-2c68-47e7-958b-3bd41c38ae04": "Bangalore",
-  "66b42480-c555-4a83-934b-0a141b293c87": "Pune",
-  "535be272-42ba-4872-8387-765b5a48bf2f": "Delhi",
-  "4cbe3249-cb95-472f-8006-4ae6ea52953b": "Mumbai",
+  "d5acb7da-108f-463f-8d65-38e5dd1bb059": "Hyderabad",
+  "61e68d7f-27ec-4532-84d8-fbb4475188c0": "Kochi",
+  "8f7658b8-ddc3-4641-bf5f-3407a9b8ae28": "Bangalore",
+  "0480ffe2-1935-42b2-be3d-7a861f3ba62d": "Pune",
+  "6673c96b-32b8-4423-ad24-da8716e9df80": "Delhi",
+  "c1f7d17e-422d-494e-93cc-06d05b8cb58a": "Mumbai",
 }
+
 const TicketStatus = {
   1: "Open",
   2: "Assigned",

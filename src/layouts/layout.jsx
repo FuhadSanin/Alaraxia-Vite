@@ -41,6 +41,9 @@ export default function Layout() {
       } else if (ticketPath.startsWith("/closed")) {
         setActiveSubmenu("Closed Ticket")
       }
+    } else if (location.pathname.startsWith("/preventing-maintanence")) {
+      setActive("Preventing Maintanence")
+      setActiveSubmenu("") // No submenus for preventing maintanence
     } else if (location.pathname.startsWith("/management")) {
       setActive("User Management")
       const managementPath = location.pathname.split("/management")[1]

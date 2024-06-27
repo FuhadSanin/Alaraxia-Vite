@@ -17,6 +17,9 @@ import TicketPending from "@pages/Ticket/TicketPending"
 import TicketCancelled from "@pages/Ticket/TicketCancelled"
 import TicketClosed from "@pages/Ticket/TicketClosed/TicketClosed"
 import TicketAssign from "@pages/Ticket/TicketAssign"
+import UserProfile from "@pages/Auth/UserProfile"
+import ManagementCustomer from "@pages/Management/CustomerManagement/ManagementCustomer"
+import PreventingMaintanence from "@pages/Preventing Maintanence/PreventingMaintanence"
 
 const Admin = () => (
   <Route path="/" element={<Layout />}>
@@ -34,8 +37,11 @@ const Admin = () => (
     <Route path="ticket/pending" element={<TicketPending />} />
     <Route path="ticket/cancelled" element={<TicketCancelled />} />
     <Route path="ticket/closed" element={<TicketClosed />} />
+    <Route path="preventing-maintanence" element={<PreventingMaintanence />} />
     <Route path="management/staff" element={<ManagementStaff />} />
+    <Route path="management/customer" element={<ManagementCustomer />} />
     <Route path="reports" element={<Reports />} />
+    <Route path="/profile" element={<UserProfile />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Route>
 )
@@ -46,8 +52,8 @@ const Technicain = () => (
       <Route index element={<Dashboard />} />
       <Route path="ticket/assigned" element={<TicketAssign />} />
       <Route path="ticket/view/:id" element={<TicketView />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
-    <Route path="*" element={<h1>UnAuthorised</h1>} />
   </>
 )
 

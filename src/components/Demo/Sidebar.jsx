@@ -8,8 +8,15 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { ChevronRight, LogOut, Settings, User } from "lucide-react"
+} from "@components/ui/accordion"
+import {
+  ChevronRight,
+  ClipboardCheck,
+  LogOut,
+  PieChart,
+  Settings,
+  User,
+} from "lucide-react"
 import { Home, Ticket, Users, ClipboardMinus } from "lucide-react"
 
 import { useAuth } from "@context/AuthContext"
@@ -224,6 +231,11 @@ const sidebarConfig = {
       ],
     },
     {
+      icon: <ClipboardCheck size={20} />,
+      text: "Preventing Maintanence",
+      to: "/preventing-maintanence",
+    },
+    {
       icon: <Users size={20} />,
       text: "User Management",
       to: "/management/staff",
@@ -233,7 +245,7 @@ const sidebarConfig = {
       ],
     },
     {
-      icon: <ClipboardMinus size={20} />,
+      icon: <PieChart size={20} />,
       text: "Reports",
       to: "/reports",
     },
