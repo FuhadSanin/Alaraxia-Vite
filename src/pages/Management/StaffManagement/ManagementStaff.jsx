@@ -21,7 +21,13 @@ import {
 } from "@components/ui/pagination"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
-import { CallType, LocationMap, TicketStatus } from "@constants/constants"
+import {
+  CallType,
+  LocationMap,
+  TicketStatus,
+  UserType,
+  UserTypeMap,
+} from "@constants/constants"
 import { Download, SlidersHorizontal, Archive } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Input } from "@components/ui/input"
@@ -30,20 +36,15 @@ import { Eye, Pencil, EllipsisVertical } from "lucide-react"
 import ModalUserAdd from "./ModalUserAdd"
 import ModalUserDelete from "./ModalUserDelete"
 
-const useUsersQuery = (
-  authToken,
-  itemsPerPage,
-  searchInput,
-  selectedLocation
-) => {
+const useUsersQuery = (authToken, itemsPerPage, searchInput, kind) => {
   return useQuery({
-    queryKey: ["users", authToken, itemsPerPage, searchInput, selectedLocation],
+    queryKey: ["users", authToken, itemsPerPage, searchInput, kind],
     queryFn: async () => {
       try {
         const data = {
           limit: itemsPerPage,
           search: searchInput,
-          location: selectedLocation,
+          kind: kind,
         }
         const response = await Services.getUsers(authToken, data)
         return response.data.results
@@ -74,7 +75,6 @@ const UserTable = ({ users }) => (
         <TableCell>User Role</TableCell>
         <TableCell>Email Address</TableCell>
         <TableCell>Phone</TableCell>
-        <TableCell>Location</TableCell>
         <TableCell>Action</TableCell>
       </TableRow>
     </TableHeader>
@@ -82,10 +82,9 @@ const UserTable = ({ users }) => (
       {users.map((user, index) => (
         <TableRow key={index}>
           <TableCell>{user.name}</TableCell>
-          <TableCell>{user.kind}</TableCell>
+          <TableCell>{UserTypeMap[user.kind]}</TableCell>
           <TableCell>{user.email}</TableCell>
           <TableCell>{user.phone_number}</TableCell>
-          <TableCell>{user.location || "N/A"}</TableCell>
           <TableCell>
             <div className="flex gap-3 items-center cursor-pointer">
               <Eye size={20} />
@@ -150,30 +149,18 @@ const ManagementStaff = () => {
 
   const [state, setState] = useState({
     searchInput: "",
-    selectedLocation: undefined,
+    kind: undefined,
     itemsPerPage: 5,
   })
 
-  const { searchInput, selectedLocation, itemsPerPage } = state
+  const { searchInput, kind, itemsPerPage } = state
 
   const {
     isLoading,
     isError,
     error,
     data: users,
-  } = useUsersQuery(authToken, itemsPerPage, searchInput, selectedLocation)
-
-  const { data: locations } = useQuery({
-    queryKey: ["locations", authToken],
-    queryFn: async () => {
-      const response = await Services.getLocations(authToken)
-      const mappedLocations = response.data.results.map(location => ({
-        value: location.uuid,
-        label: location.name,
-      }))
-      return mappedLocations
-    },
-  })
+  } = useUsersQuery(authToken, itemsPerPage, searchInput, kind)
 
   const {
     data: userSummary,
@@ -296,27 +283,14 @@ const ManagementStaff = () => {
               />
             </div>
             <div className="flex gap-5 items-center justify-center">
-              <div className="flex">
-                <SelectDemo
-                  label="Location"
-                  options={locations}
-                  value={selectedLocation}
-                  onChange={value =>
-                    setState(prevState => ({
-                      ...prevState,
-                      selectedLocation: value,
-                    }))
-                  }
-                />
-              </div>
               <SelectDemo
                 label="User Role"
-                options={locations}
-                value={selectedLocation}
+                options={UserType}
+                value={kind}
                 onChange={value =>
                   setState(prevState => ({
                     ...prevState,
-                    selectedLocation: value,
+                    kind: value,
                   }))
                 }
               />
@@ -333,7 +307,11 @@ const ManagementStaff = () => {
             <SkeletonRows rows={5} columns={7} />
           ) : (
             <>
-              {isMobile ? (
+              {users.length === 0 ? (
+                <div className="flex justify-center items-center h-40">
+                  <p className="text-gray-500">No Users found</p>
+                </div>
+              ) : isMobile ? (
                 <UserMobileView users={users} />
               ) : (
                 <UserTable users={users} />

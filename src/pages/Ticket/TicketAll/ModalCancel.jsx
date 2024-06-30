@@ -96,10 +96,11 @@ const TicketAddForm = ({ id }) => {
     </Form>
   )
 }
-const ModalCancel = () => {
-  const { id } = useParams()
+const ModalCancel = ({ id: routeId }) => {
+  const { id: paramsId } = useParams()
   const { authToken } = useAuth()
   const [ticket, setTicket] = useState(null)
+  const id = routeId || paramsId
 
   useEffect(() => {
     const fetchTicket = async () => {

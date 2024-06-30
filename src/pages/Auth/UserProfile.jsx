@@ -128,6 +128,7 @@ function PasswordDetails() {
   const mutation = useMutation({
     mutationFn: async data => {
       const response = await Services.changePassword(authToken, data)
+      console.log(response)
       return response.data
     },
     onSuccess: data => {
@@ -136,11 +137,14 @@ function PasswordDetails() {
         description: "Profile Updated Successfully",
         variant: "success",
       })
+      form.reset()
+      navigate("/")
     },
     onError: error => {
       toast({
         title: "Error",
-        description: error.message,
+        description:
+          error.response.data.new_password || error.response.data.old_password,
         variant: "destructive",
       })
     },

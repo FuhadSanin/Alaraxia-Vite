@@ -23,6 +23,7 @@ import { useAuth } from "@context/AuthContext"
 import { Popover, PopoverContent, PopoverTrigger } from "@components/ui/popover"
 import { useToast } from "@components/ui/use-toast"
 import { useMediaQuery } from "react-responsive"
+import { UserTypeMap } from "@constants/constants"
 
 function Sidebar({ children }) {
   const { authToken, userProfile, setAuthToken, setUserProfile } = useAuth()
@@ -82,7 +83,7 @@ function Sidebar({ children }) {
                   {userProfile.name || "User Name"}
                 </h4>
                 <span className="text-xs text-gray-600">
-                  {userProfile.kind === 5 ? "Administrator" : "Technician"}
+                  {UserTypeMap[userProfile.kind]}
                 </span>
               </div>
             </div>
@@ -90,7 +91,12 @@ function Sidebar({ children }) {
           <div>
             <Popover>
               <PopoverTrigger>
-                <Settings size={20} />
+                <Settings
+                  size={20}
+                  className={`
+               ${expanded ? "w-10" : "w-0"}
+          `}
+                />
               </PopoverTrigger>
               <PopoverContent>
                 <ul className="flex flex-col gap-2">
@@ -154,7 +160,7 @@ function SidebarSubItem({
               {icon}
               <span
                 className={`overflow-hidden transition-all ${
-                  expanded ? "w-52 ml-3" : "w-0"
+                  expanded ? "w-24 ml-3" : "w-0"
                 }`}
               >
                 <span>{text}</span>
@@ -260,6 +266,53 @@ const sidebarConfig = {
       icon: <Ticket size={20} />,
       text: "Assigned Tickets",
       to: "/ticket/assigned",
+    },
+  ],
+  2: [
+    {
+      icon: <Ticket size={20} />,
+      text: "Tickets",
+      to: "/ticket/open",
+    },
+  ],
+  3: [
+    {
+      icon: <Home size={20} />,
+      text: "Dashboard",
+      to: "/",
+    },
+    {
+      icon: <Ticket size={20} />,
+      text: "Tickets",
+      to: "/ticket",
+      submenus: [
+        { text: "All Tickets", to: "/ticket" },
+        { text: "Open Ticket", to: "/ticket/open" },
+        { text: "Assigned Ticket", to: "/ticket/assigned" },
+        { text: "Pending Ticket", to: "/ticket/pending" },
+        { text: "Cancelled Ticket", to: "/ticket/cancelled" },
+        { text: "Closed Ticket", to: "/ticket/closed" },
+      ],
+    },
+  ],
+  4: [
+    {
+      icon: <Home size={20} />,
+      text: "Dashboard",
+      to: "/",
+    },
+    {
+      icon: <Ticket size={20} />,
+      text: "Tickets",
+      to: "/ticket",
+      submenus: [
+        { text: "All Tickets", to: "/ticket" },
+        { text: "Open Ticket", to: "/ticket/open" },
+        { text: "Assigned Ticket", to: "/ticket/assigned" },
+        { text: "Pending Ticket", to: "/ticket/pending" },
+        { text: "Cancelled Ticket", to: "/ticket/cancelled" },
+        { text: "Closed Ticket", to: "/ticket/closed" },
+      ],
     },
   ],
 }

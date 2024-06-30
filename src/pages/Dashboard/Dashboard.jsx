@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { PieChart } from "@mui/x-charts/PieChart"
 import {
@@ -17,6 +17,7 @@ import { useAuth } from "@context/AuthContext"
 import { useQuery } from "@tanstack/react-query"
 import Services from "@services/services"
 import { CallType, LocationMap } from "@constants/constants"
+import { SelectDemo } from "@components/Demo/SelectDemo"
 
 // Card Colors Images
 import green from "@assets/Cards/green.png"
@@ -27,15 +28,25 @@ import orange from "@assets/Cards/orange.png"
 const Dashboard = () => {
   const isMobile = useMediaQuery({ maxWidth: 768 })
   const { authToken } = useAuth()
+  const [state, setState] = useState({
+    selectedLocation: undefined,
+    selectedFromDate: null,
+    selectedToDate: null,
+  })
+  const filter = {
+    location: state.selectedLocation,
+    created_at_before: state.selectedFromDate,
+    created_at_before: state.selectedToDate,
+  }
 
   const {
     data: tickets,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["tickets", authToken],
+    queryKey: ["tickets", authToken, filter],
     queryFn: async () => {
-      const response = await Services.getTickets(authToken)
+      const response = await Services.getTickets(authToken, filter)
       return response.data.results
     },
   })
@@ -47,24 +58,48 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["userSummary", authToken],
     queryFn: async () => {
-      const response = await Services.getUsersSummary(authToken)
+      const response = await Services.getUsersSummary(authToken, filter)
       return response.data
     },
   })
 
-  // const {
-  //   data: ticketSummary,
-  //   isLoading: isLoadingTicketSummary,
-  //   isError: isErrorTicketSummary,
-  // } = useQuery({
-  //   queryKey: ["ticketSummary", authToken],
-  //   queryFn: async () => {
-  //     const response = await Services.getTicketsSummary(authToken)
-  //     return response.data
-  //   },
-  // })
+  const {
+    data: ticketSummary,
+    isLoading: isLoadingTicketSummary,
+    isError: isErrorTicketSummary,
+  } = useQuery({
+    queryKey: ["ticketSummary", authToken],
+    queryFn: async () => {
+      const response = await Services.getTicketsSummary(authToken, filter)
+      return response.data
+    },
+  })
 
-  // console.log(ticketSummary)
+  const { data: locations } = useQuery({
+    queryKey: ["locations", authToken],
+    queryFn: async () => {
+      const response = await Services.getLocations(authToken)
+      const mappedLocations = response.data.results.map(location => ({
+        value: location.uuid,
+        label: location.name,
+      }))
+      return mappedLocations
+    },
+  })
+
+  const handleFromDate = date => {
+    setState(prevState => ({
+      ...prevState,
+      selectedFromDate: JSON.stringify(date).slice(1, 11),
+    }))
+  }
+
+  const handleToDate = date => {
+    setState(prevState => ({
+      ...prevState,
+      selectedToDate: JSON.stringify(date).slice(1, 11),
+    }))
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -72,9 +107,31 @@ const Dashboard = () => {
         <h1 className="text-2xl font-bold mb-4">Overview</h1>
         {!isMobile && (
           <div className="flex flex-wrap items-center gap-2">
-            <DatePickerDemo placeholder="From Date" />
-            <span className="text-gray-600">To</span>
-            <DatePickerDemo placeholder="To Date" />
+            <div className="flex">
+              <SelectDemo
+                label="Location"
+                options={locations}
+                value={state.selectedLocation}
+                onChange={value =>
+                  setState(prevState => ({
+                    ...prevState,
+                    selectedLocation: value,
+                  }))
+                }
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <DatePickerDemo
+                placeholder="From Date"
+                onSelectDate={handleFromDate}
+              />
+
+              <span className="text-gray-600">To</span>
+              <DatePickerDemo
+                placeholder="To Date"
+                onSelectDate={handleToDate}
+              />
+            </div>
           </div>
         )}
       </div>
@@ -114,10 +171,40 @@ const Dashboard = () => {
 
           {!isMobile && (
             <div className="flex gap-4 mt-4">
-              <Smallcards />
-              <Smallcards />
-              <Smallcards />
-              <Smallcards />
+              {
+                // Smallcards
+                isLoadingTicketSummary ? (
+                  <div>Loading...</div>
+                ) : isErrorTicketSummary ? (
+                  <div>Error loading ticket summary</div>
+                ) : (
+                  <>
+                    <Smallcards
+                      title="Total Tickets"
+                      value={
+                        ticketSummary["Open"] +
+                        ticketSummary["Closed"] +
+                        ticketSummary["Cancelled"] +
+                        ticketSummary["Pending"] +
+                        ticketSummary["Assigned"] +
+                        ticketSummary["Requested for closing"]
+                      }
+                    />
+                    <Smallcards
+                      title="Total Pending"
+                      value={ticketSummary["Pending"]}
+                    />
+                    <Smallcards
+                      title="Total Assigned"
+                      value={ticketSummary["Assigned"]}
+                    />
+                    <Smallcards
+                      title="Total Escalated"
+                      value={ticketSummary["escalated"]}
+                    />
+                  </>
+                )
+              }
             </div>
           )}
         </div>

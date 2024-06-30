@@ -24,7 +24,7 @@ class Services {
   }
 
   changePassword(authToken, data) {
-    return http.patch(`api/v1/users/change_password/`, data, {
+    return http.post("api/v1/users/change-password/", data, {
       headers: {
         Authorization: `${authToken.token}`,
       },
@@ -224,10 +224,13 @@ class Services {
     })
   }
 
-  getCustomers(authToken) {
+  getCustomers(authToken, data = {}) {
     return http.get("api/v1/customers", {
       headers: {
         Authorization: `${authToken.token}`,
+      },
+      params: {
+        search: data.search,
       },
     })
   }
@@ -240,18 +243,28 @@ class Services {
     })
   }
   // ---------------Summary (Dashboard)----------------
-  getUsersSummary(authToken) {
+  getUsersSummary(authToken, data = {}) {
     return http.get("api/v1/users/summary/", {
       headers: {
         Authorization: `${authToken.token}`,
       },
+      params: {
+        location: data.location,
+        created_at_before: data.created_at_before,
+        created_at_after: data.created_at_after,
+      },
     })
   }
 
-  getTicketsSummary(authToken) {
+  getTicketsSummary(authToken, data = {}) {
     return http.get("api/v1/tickets/status_summary/", {
       headers: {
         Authorization: `${authToken.token}`,
+      },
+      params: {
+        location: data.location,
+        created_at_before: data.created_at_before,
+        created_at_after: data.created_at_after,
       },
     })
   }
@@ -266,6 +279,25 @@ class Services {
 
   getTicketCallTypeSummary(authToken) {
     return http.get("api/v1/tickets/ticket_call_type_summary/", {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+    })
+  }
+
+  getPreventiveMaintenance(authToken, data = {}) {
+    return http.get("api/v1/preventivemaintenance/", {
+      headers: {
+        Authorization: `${authToken.token}`,
+      },
+      params: {
+        search: data.search,
+      },
+    })
+  }
+  // ---------------Notifications----------------
+  getNotifications(authToken) {
+    return http.get("api/v1/notifications/", {
       headers: {
         Authorization: `${authToken.token}`,
       },

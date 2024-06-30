@@ -3,7 +3,6 @@ import { useMediaQuery } from "react-responsive"
 import { Skeleton } from "@components/ui/skeleton"
 import { SelectDemo } from "@components/Demo/SelectDemo"
 import { Card, CardContent, CardDescription } from "@components/ui/card"
-import { DatePickerDemo } from "@components/ui/datepicker"
 import { Button } from "@components/ui/button"
 import {
   Table,
@@ -23,49 +22,29 @@ import {
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@components/ui/dialog"
-import { CallType, LocationMap, TicketStatus } from "@constants/constants"
+  CallType,
+  LocationMap,
+  TicketStatus,
+  PreventiveMaintenanceStatus,
+} from "@constants/constants"
 import { Download, SlidersHorizontal, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Input } from "@components/ui/input"
 import { useQuery } from "@tanstack/react-query"
 import { Eye, Pencil } from "lucide-react"
 
-const useTicketsQuery = (
-  authToken,
-  itemsPerPage,
-  searchInput,
-  selectedLocation,
-  selectedFromDate,
-  selectedToDate
-) => {
+const useTicketsQuery = (authToken, searchInput, status) => {
   return useQuery({
-    queryKey: [
-      "tickets",
-      authToken,
-      itemsPerPage,
-      searchInput,
-      selectedLocation,
-      selectedFromDate,
-      selectedToDate,
-    ],
+    queryKey: ["tickets", authToken, searchInput, status],
     queryFn: async () => {
       try {
         let response
         const data = {
-          limit: itemsPerPage,
           search: searchInput,
-          location: selectedLocation,
-          created_at_after: selectedFromDate,
-          created_at_before: selectedToDate,
-          ticket_status: 2,
+          location: status,
         }
-        response = await Services.getTickets(authToken, data)
+        response = await Services.getPreventiveMaintenance(authToken, data)
+        console.log(response)
 
         return response.data.results
       } catch (error) {
@@ -196,45 +175,18 @@ const PreventingMaintanence = () => {
 
   const [state, setState] = useState({
     searchInput: "",
-    selectedLocation: undefined,
-    selectedFromDate: null,
-    selectedToDate: null,
+    status: undefined,
     itemsPerPage: 5,
   })
 
-  const {
-    searchInput,
-    selectedLocation,
-    selectedFromDate,
-    selectedToDate,
-    itemsPerPage,
-  } = state
+  const { searchInput, status, itemsPerPage } = state
 
   const {
     isLoading,
     isError,
     error,
     data: tickets,
-  } = useTicketsQuery(
-    authToken,
-    itemsPerPage,
-    searchInput,
-    selectedLocation,
-    selectedFromDate,
-    selectedToDate
-  )
-
-  const { data: locations } = useQuery({
-    queryKey: ["locations", authToken],
-    queryFn: async () => {
-      const response = await Services.getLocations(authToken)
-      const mappedLocations = response.data.results.map(location => ({
-        value: location.uuid,
-        label: location.name,
-      }))
-      return mappedLocations
-    },
-  })
+  } = useTicketsQuery(authToken, searchInput, status)
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -257,19 +209,6 @@ const PreventingMaintanence = () => {
     }))
   }
 
-  const handleFromDate = date => {
-    setState(prevState => ({
-      ...prevState,
-      selectedFromDate: JSON.stringify(date).slice(1, 11),
-    }))
-  }
-
-  const handleToDate = date => {
-    setState(prevState => ({
-      ...prevState,
-      selectedToDate: JSON.stringify(date).slice(1, 11),
-    }))
-  }
 
   if (isError) {
     return (
@@ -301,12 +240,12 @@ const PreventingMaintanence = () => {
             <div className="flex gap-5 items-center justify-center">
               <SelectDemo
                 label="Status"
-                options={locations}
-                value={selectedLocation}
+                options={PreventiveMaintenanceStatus}
+                value={status}
                 onChange={value =>
                   setState(prevState => ({
                     ...prevState,
-                    selectedLocation: value,
+                    status: value,
                   }))
                 }
               />

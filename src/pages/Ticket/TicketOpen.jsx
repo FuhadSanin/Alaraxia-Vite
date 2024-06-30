@@ -42,6 +42,8 @@ import { Input } from "@components/ui/input"
 import { useQuery } from "@tanstack/react-query"
 import { Eye, Pencil } from "lucide-react"
 import ModalAssign from "./TicketAll/ModalAssign"
+import { Popover, PopoverContent, PopoverTrigger } from "@components/ui/popover"
+import ModalCancel from "./TicketAll/ModalCancel"
 
 const useTicketsQuery = (
   authToken,
@@ -132,7 +134,14 @@ const TicketTable = ({ tickets }) => (
                   <Eye size={20} />
                 </Link>
                 <Pencil size={20} />
-                <EllipsisVertical size={20} />
+                <Popover>
+                  <PopoverTrigger>
+                    <EllipsisVertical size={20} />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-fit h-fit bg-transparent">
+                    <ModalCancel id={ticket.uuid} />
+                  </PopoverContent>
+                </Popover>
               </div>
             </TableCell>
           </TableRow>

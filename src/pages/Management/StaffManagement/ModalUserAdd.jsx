@@ -29,6 +29,7 @@ import { useToast } from "@components/ui/use-toast"
 import { SelectDemo } from "@components/Demo/SelectDemo"
 import Services from "@services/services"
 import { useAuth } from "@context/AuthContext"
+import { UserType } from "@constants/constants"
 
 // Define the form schema using Zod
 const FormSchema = z.object({
@@ -136,10 +137,7 @@ const TicketAddForm = () => {
               <SelectDemo
                 label="User Role"
                 width={80}
-                options={[
-                  { label: "Technician", value: "1" },
-                  { label: "Admin", value: "5" },
-                ]}
+                options={UserType}
                 value={field.value}
                 onChange={field.onChange}
               />

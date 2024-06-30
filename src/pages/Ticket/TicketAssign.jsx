@@ -37,6 +37,7 @@ import { Input } from "@components/ui/input"
 import { useQuery } from "@tanstack/react-query"
 import { Eye, Pencil } from "lucide-react"
 import ModalAssign from "./TicketAll/ModalAssign"
+import { format, parseISO } from "date-fns"
 
 const useTicketsQuery = (
   authToken,
@@ -117,7 +118,13 @@ const TicketTable = ({ tickets }) => (
             </TableCell>
             <TableCell>{ticket.product_name}</TableCell>
             <TableCell>{CallType[ticket.call_type]}</TableCell>
-            <TableCell>{ticket.assigned_on?.slice(0, 10)}</TableCell>
+            <TableCell>
+              {ticket.assigned_on &&
+                format(
+                  parseISO(ticket.assigned_on?.slice(0, 10)),
+                  "dd MMMM, yyyy"
+                )}
+            </TableCell>
             <TableCell>{LocationMap[ticket.location]}</TableCell>
             <TableCell>{ticket.assigned_technician_name}</TableCell>
             <TableCell>
@@ -164,7 +171,10 @@ const TicketMobileView = ({ tickets }) => (
               <tr>
                 <CardDescription>Assgined On</CardDescription>
                 <td className="text-right">
-                  {ticket.assigned_on?.slice(0, 10) || "N/A"}
+                  {format(
+                    parseISO(ticket.assigned_on?.slice(0, 10)),
+                    "dd MMMM, yyyy"
+                  )}
                 </td>
               </tr>
               <tr>

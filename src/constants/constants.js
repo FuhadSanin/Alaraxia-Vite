@@ -82,6 +82,27 @@ const TicketStatus = {
   6: "Requested for closing",
 }
 
+const PreventiveMaintenanceStatus = [
+  { value: "1", label: "Active" },
+  { value: "2", label: "Expired" },
+]
+
+const UserTypeMap = {
+  1: "Technician",
+  2: "Call Center Agent",
+  3: "Customer Care Officer",
+  4: "Area Service Manager",
+  5: "Admin",
+}
+
+const UserType = [
+  { value: "1", label: "Technician" },
+  { value: "2", label: "Call Center Agent" },
+  { value: "3", label: "Customer Care Officer" },
+  { value: "4", label: "Area Service Manager" },
+  { value: "5", label: "Admin" },
+]
+
 export {
   CallType,
   ServiceType,
@@ -93,4 +114,7 @@ export {
   CancellationReason,
   LocationMap,
   CancellationReasonMap,
+  PreventiveMaintenanceStatus,
+  UserTypeMap,
+  UserType,
 }

@@ -221,32 +221,35 @@ const ModalAssign = ({ id: propId, title }) => {
                 </div>
               </CardContent>
             </Card>
-            <Card className="dark:bg-background ">
-              <CardContent className="flex  items-center p-0">
-                <h6 className="text-sm font-medium">Customer Details</h6>
-              </CardContent>
-              <hr className="mt-3 mb-3" />
-              <CardContent className="flex  items-center p-0">
-                <table className="w-full">
-                  <tbody>
-                    <tr className="flex justify-between items-center">
-                      <CardDescription>Technician Name</CardDescription>
-                      <td className="text-right font-medium">
-                        {ticket?.assigned_technician_name}
-                      </td>
-                    </tr>
-                    <tr>
-                      <CardDescription>Scheduled Date</CardDescription>
-                      <td className="text-right">{ticket?.scheduled_date}</td>
-                    </tr>
-                    <tr>
-                      <CardDescription>Scheduled Time</CardDescription>
-                      <td className="text-right"> {ticket?.from_time}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
+            {title === "Reassign" && (
+              <Card className="dark:bg-background ">
+                <CardContent className="flex  items-center p-0">
+                  <h6 className="text-sm font-medium">Customer Details</h6>
+                </CardContent>
+                <hr className="mt-3 mb-3" />
+                <CardContent className="flex  items-center p-0">
+                  <table className="w-full">
+                    <tbody>
+                      <tr className="flex justify-between items-center">
+                        <CardDescription>Technician Name</CardDescription>
+                        <td className="text-right font-medium">
+                          {ticket?.assigned_technician_name}
+                        </td>
+                      </tr>
+                      <tr>
+                        <CardDescription>Scheduled Date</CardDescription>
+                        <td className="text-right">{ticket?.scheduled_date}</td>
+                      </tr>
+                      <tr>
+                        <CardDescription>Scheduled Time</CardDescription>
+                        <td className="text-right"> {ticket?.from_time}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="pt-5">
               <TicketAddForm
                 technicians={technicians}
